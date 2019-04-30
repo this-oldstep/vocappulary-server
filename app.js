@@ -4,7 +4,7 @@ const router = express.Router();
 const bodyParser = require('body-parser');
 
 
-app.use(bodyParser.json({ type: 'application/*+json'}));
+app.use(bodyParser.json({ type: 'application/json'}));
 
 ///////////////
 /// Routes ////
