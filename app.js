@@ -12,12 +12,13 @@ app.use(bodyParser.json({ type: 'application/json'}));
 
 
 const images = require('./routes/images');
-
+const textToSpeech = require('./routes/text-to-speech.js')
 
 
 ///////////////
 
 app.use('/images', images);
+app.use('/texttospeech', textToSpeech);
 
 
 

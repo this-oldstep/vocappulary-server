@@ -4,6 +4,7 @@
   "description": "server for language learning app Vocappulary",
   "main": "app.js",
   "dependencies": {
+    "@google-cloud/text-to-speech": "^0.5.1",
     "body-parser": "^1.19.0",
     "clarifai": "^2.9.0",
     "dotenv": "^7.0.0",
