@@ -2,6 +2,18 @@ require('dotenv').config()
 const Sequelize = require('sequelize');
 
 ////////////////////
+////CONNECTION//////
+///////////////////
+
+
+
+const sequelize = new Sequelize('vocapp', process.env.DB_USER, process.env.DB_PASSWORD, {
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT,
+  dialect: 'postgres'
+});
+
+////////////////////
 //////MODELS////////
 ////////////////////
 
@@ -163,16 +175,11 @@ const Translation = sequelize.define('translation', {
 
 
 /////////////////////
-///////CONFIG////////
+///////SYNC////////
 /////////////////////
 
-const sequelize = new Sequelize('vocapp', process.env.DB_USER, process.env.DB_PASSWORD, {
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
-  dialect: 'postgres'
-});
 
-db.sequelize
+sequelize
   .sync()
   .then(result => {
     console.log('succesfully connected to database', result);
