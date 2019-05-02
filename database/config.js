@@ -29,12 +29,9 @@ const User = sequelize.define('user', {
     type: Sequelize.STRING,
     allowNull: false
   },
-  id_languages_native : {
-    type: Sequelize.INTEGER
-  },
-  id_languages_current : {
-    type: Sequelize.INTEGER
-  },
+ email: {
+  type: Sequelize.STRING
+ },
   points: {
     type: Sequelize.INTEGER
   }
@@ -52,9 +49,6 @@ const Collection = sequelize.define('collection', {
   public: {
     type: Sequelize.BOOLEAN
   },
-  id_user: {
-    type: Sequelize.INTEGER
-  },
   count: {
     type: Sequelize.INTEGER
   }
@@ -69,15 +63,9 @@ const CollectionItem = sequelize.define('collection_item', {
     allowNull: false,
     primaryKey: true
   },
-  id_collection: {
-    type: Sequelize.INTEGER
-  },
   image_url: {
     type: Sequelize.STRING
   },
-  id_eng_word: {
-    type: Sequelize.INTEGER
-  }
 })
 
 //Languages Model//
@@ -123,12 +111,6 @@ const Lesson = sequelize.define('lesson', {
     allowNull: false,
     primaryKey: true
   },
-  id_user: {
-    type: Sequelize.INTEGER
-  },
-  id_language: {
-    type: Sequelize.INTEGER
-  }
 })
 
 //Translations//
@@ -140,13 +122,7 @@ const Translation = sequelize.define('translation', {
     allowNull: false,
     primaryKey: true
   },
-  id_word: {
-    type: Sequelize.INTEGER
-  },
-  id_lang: {
-    type: Sequelize.INTEGER
-  },
-  word: {
+  text: {
     type: Sequelize.STRING
   },
   audio_url: {
@@ -161,37 +137,24 @@ const Translation = sequelize.define('translation', {
 ////////////////////
 
 //Language OTM Users - native language //
-
-Language.hasMany(User, {as: 'id_language_native'});
-User.belongsTo(Language);
+User.belongsTo(Language, {as: 'native_language'});
 
 //Language OTM Users - current language //
-
-Language.hasMany(User, {as: 'id_language_current'});
-User.belongsTo(Language);
+ User.belongsTo(Language, {as: 'current_language'});
 
 //User OTM Collections //
-
-User.hasMany(Collection, {as: 'id_user'});
 Collection.belongsTo(User);
 
-
 //User-Languages MTM //
-
-User.belongsToMany(Language, { as: 'Languages', through: { model: Lesson, unique: false }, foreignKey: 'user_id' });
-Language.belongsToMany(User, {as: 'Users', through: {model: Lesson, unique: false, foreignKey: 'language_id'}});
+User.belongsToMany(Language, { as: 'user', through: { model: Lesson, unique: false }});
 
 //Words-Languages MTM //
+Word.belongsToMany(Language, {as: 'word', through: {model: Translation, unique: false}});
 
 //Words OTM Collection Items//
-
-Word.hasMany(CollectionItem, {as: 'id_eng_word'});
 CollectionItem.belongsTo(Word);
 
-
 //Collection OTM Collection_items //
-
-Collection.hasMany(CollectionItem, {as: 'id_collection'});
 CollectionItem.belongsTo(Collection);
 
 
@@ -210,7 +173,7 @@ CollectionItem.belongsTo(Collection);
 
 
 sequelize
-  .sync()
+  .sync({force: true})
   .then(result => {
     console.log('succesfully connected to database', result);
   })
