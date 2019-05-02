@@ -5,8 +5,6 @@ const Sequelize = require('sequelize');
 ////CONNECTION//////
 ///////////////////
 
-
-
 const sequelize = new Sequelize('vocapp', process.env.DB_USER, process.env.DB_PASSWORD, {
   host: process.env.DB_HOST,
   port: process.env.DB_PORT,
@@ -162,7 +160,19 @@ const Translation = sequelize.define('translation', {
 ////RELATIONSHIPS///
 ////////////////////
 
+//Language OTM Users - native language //
 
+//Language OTM Users - current language //
+
+//User OTM Collections //
+
+//User-Languages MTM //
+
+//Words-Languages MTM //
+
+//Words OTM Collections//
+
+//Collection OTM Collection_items //
 
 
 
