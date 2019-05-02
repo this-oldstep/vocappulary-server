@@ -4,8 +4,20 @@ const router = express.Router();
 const fs = require('fs');
 const util = require('util');
 const textToSpeech = require('@google-cloud/text-to-speech');
+const AWS = require('aws-sdk');
+const path = require('path');
 
 const client = new textToSpeech.TextToSpeechClient();
+
+
+//Configuring AWS environment
+
+AWS.config.update({
+  accessKeyId: process.env.AWS_ACCESS_KEY,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+});
+
+var S3 = new AWS.S3();
 
 
 
@@ -15,7 +27,7 @@ router.get('/:word', (req, res) => {
   const word = req.params.word;
 
   async function main() {
-    
+
     const request = {
       input: { text: word },
       voice: { languageCode: 'en-US', ssmlGender: 'NEUTRAL' },
@@ -28,10 +40,32 @@ router.get('/:word', (req, res) => {
     const writeFile = util.promisify(fs.writeFile);
     await writeFile(`${word}.mp3`, response.audioContent, 'binary');
     console.log(`Audio content written to file: ${word}.mp3`);
-    res.send('done');
+
+    const filePath = `./${word}.mp3`;
+
+    const params = {
+      Bucket: 'vocapp',
+      Body: fs.createReadStream(filePath),
+      Key: "folder/" + Date.now() + "_" + path.basename(filePath)
+    };
+
+    s3.upload(params, function (err, data) {
+      //handle error
+      if (err) {
+        console.log("Error", err);
+      }
+
+      //success
+      if (data) {
+        console.log("Uploaded in:", data.Location);
+      }
+    });
+
+
+    //res.send('done');
   }
 
-main();
+  main();
 
 })
 
