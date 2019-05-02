@@ -6,7 +6,6 @@ const util = require('util');
 const textToSpeech = require('@google-cloud/text-to-speech');
 const AWS = require('aws-sdk');
 const path = require('path');
-
 const client = new textToSpeech.TextToSpeechClient();
 
 
@@ -44,25 +43,25 @@ router.get('/:word', (req, res) => {
     const filePath = `./${word}.mp3`;
 
     const params = {
-      Bucket: 'vocapp',
+      Bucket: 'vocapp-bucket',
       Body: fs.createReadStream(filePath),
-      Key: "folder/" + Date.now() + "_" + path.basename(filePath)
+      Key: "words/" + path.basename(filePath),
+      ACL: 'public-read'
     };
 
-    s3.upload(params, function (err, data) {
-      //handle error
+    S3.upload(params, function (err, data) {
       if (err) {
         console.log("Error", err);
+        res.send(err);
       }
-
-      //success
       if (data) {
+        fs.unlinkSync(`${word}.mp3`);
         console.log("Uploaded in:", data.Location);
+        res.send('uploaded at: ' + data.Location);
       }
     });
 
 
-    //res.send('done');
   }
 
   main();
