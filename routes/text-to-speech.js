@@ -8,6 +8,8 @@ const textToSpeech = require('@google-cloud/text-to-speech');
 const client = new textToSpeech.TextToSpeechClient();
 
 
+
+
 router.get('/:word', (req, res) => {
 
   const word = req.params.word;
@@ -25,7 +27,7 @@ router.get('/:word', (req, res) => {
     // Write the binary audio content to a local file
     const writeFile = util.promisify(fs.writeFile);
     await writeFile(`${word}.mp3`, response.audioContent, 'binary');
-    console.log('Audio content written to file: output.mp3');
+    console.log(`Audio content written to file: ${word}.mp3`);
     res.send('done');
   }
 

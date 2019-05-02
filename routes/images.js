@@ -16,8 +16,8 @@ const app = new Clarifai.App({ apiKey: process.env.CLARIFAI_KEY });
 // ----------------
 // 4.- FE -> user goes through array of words to confirm what the object is and sends back selected word to GET /texttospeech
 // 5.- BA -> word has to be translated to language that you're learning at the moment with _____ API
-// 6.- BA -> word is then encoded into base64? sent to s3, get URL 
-// 7.- BA -> server sends back to client the translated word && the URL for pronunciation.
+// 6.- BA -> word is then encoded into ?? sent to s3, get URL 
+// 7.- BA -> server sends back to client the translated word && the URL for pronunciation && also completes item table in DB
 
 
 router.post('/', (req, res) => {
