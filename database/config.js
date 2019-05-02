@@ -52,7 +52,7 @@ const Collection = sequelize.define('collection', {
   public: {
     type: Sequelize.BOOLEAN
   },
-  user_id: {
+  id_user: {
     type: Sequelize.INTEGER
   },
   count: {
@@ -162,17 +162,37 @@ const Translation = sequelize.define('translation', {
 
 //Language OTM Users - native language //
 
+Language.hasMany(User, {as: 'id_language_native'});
+User.belongsTo(Language);
+
 //Language OTM Users - current language //
+
+Language.hasMany(User, {as: 'id_language_current'});
+User.belongsTo(Language);
 
 //User OTM Collections //
 
+User.hasMany(Collection, {as: 'id_user'});
+Collection.belongsTo(User);
+
+
 //User-Languages MTM //
+
+User.belongsToMany(Language, { as: 'Languages', through: { model: Lesson, unique: false }, foreignKey: 'user_id' });
+Language.belongsToMany(User, {as: 'Users', through: {model: Lesson, unique: false, foreignKey: 'language_id'}});
 
 //Words-Languages MTM //
 
-//Words OTM Collections//
+//Words OTM Collection Items//
+
+Word.hasMany(CollectionItem, {as: 'id_eng_word'});
+CollectionItem.belongsTo(Word);
+
 
 //Collection OTM Collection_items //
+
+Collection.hasMany(CollectionItem, {as: 'id_collection'});
+CollectionItem.belongsTo(Collection);
 
 
 
