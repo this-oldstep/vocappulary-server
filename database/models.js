@@ -93,18 +93,6 @@ const checkWords = (imageWordList, nativeLanguage) => {
     });
 };
 
-
-checkWords([
-  "dog",
-  "shepherd",
-  "canine",
-  "german shepherd",
-  "mammal",
-], "spanish")
-  .then(results => {
-    return results;
-  })
-
 module.exports.db = {
   checkWords,
 };

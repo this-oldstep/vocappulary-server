@@ -5,6 +5,7 @@ const Clarifai = require('clarifai');
 
 const app = new Clarifai.App({ apiKey: process.env.CLARIFAI_KEY });
 
+const { db } = require('../database/models');
 //Get array of probable object names for image
 
 
@@ -22,7 +23,7 @@ const app = new Clarifai.App({ apiKey: process.env.CLARIFAI_KEY });
 
 router.post('/', (req, res) => {
 
-  const url = req.body.url;
+  const {url, nativeLanguage} = req.body;
 
   app.models.predict(Clarifai.GENERAL_MODEL, url)
     .then(({ outputs }) => {
@@ -35,7 +36,10 @@ router.post('/', (req, res) => {
         }
         return seed;
       }, [])
-      res.send(imagesArr);
+      db.checkWords(imagesArr, nativeLanguage)
+        .then(({ completeWords, incompleteWords }) => {
+          res.send({completeWords, incompleteWords});
+        })
     }).catch((err) => {
       console.log(err);
     });
