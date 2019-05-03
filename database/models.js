@@ -8,24 +8,6 @@ const {
   Translation,
 } = require("./config")
 
-Language.create({
-  name: "english",
-  flag_url: "merica.com",
-  active: 1,
-})
-  .then(() =>{
-    return Language.create({
-      name: "spanish",
-      flag_url: "same.com",
-      active: 1,
-    })
-  })
-  .then(() => {
-    Language.findAll({})
-      .then(all => {
-        return all;
-      })
-  })
 
 
 /**
@@ -35,15 +17,21 @@ Language.create({
  * @param {string} targetLanguage - language being practiced
  * @returns {object} - object that has complete requested words 
  */
-const checkWords = (imageWordList, nativeLanguage, targetLanguage) => {
+const checkWords = (imageWordList, nativeLanguage) => {
   let words = {
     completeWords: [],
     incompleteWords: [],
   }
-  // finds english language id
-  return Language.findOne({where: {name: "english"}})
-    .then(englishRow => {
-      return englishRow
+  // makes an array of promises to find the relavant word columns
+  const searchWordPromises = imageWordList.map(engWord => new Promise((res, rej) => {
+    Word.findOne({where: {eng_word: engWord}})
+      .then(col => {
+        res(col);
+      })
+  }));
+  return Promise.all(searchWordPromises)
+    .then(wordCols => {
+      return wordCols;
     })
 };
 checkWords([
