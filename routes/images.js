@@ -43,14 +43,6 @@ router.post('/', (req, res) => {
         });
     }
   });
-  const url = req.body.url;
-
-  // app.models.predict(Clarifai.GENERAL_MODEL, url)
-  //   .then((response) => {
-  //     res.send(response);
-  //   }).catch((err) => {
-  //     console.log(err);
-  //   });
 });
 
 router.post('/cloud', (req, res)=>{
