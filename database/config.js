@@ -29,9 +29,9 @@ const User = sequelize.define('user', {
     type: Sequelize.STRING,
     allowNull: false
   },
- email: {
-  type: Sequelize.STRING
- },
+  email: {
+    type: Sequelize.STRING
+  },
   points: {
     type: Sequelize.INTEGER
   }
@@ -140,7 +140,7 @@ const Translation = sequelize.define('translation', {
 User.belongsTo(Language, {as: 'native_language'});
 
 //Language OTM Users - current language //
- User.belongsTo(Language, {as: 'current_language'});
+User.belongsTo(Language, {as: 'current_language'});
 
 //User OTM Collections //
 Collection.belongsTo(User);

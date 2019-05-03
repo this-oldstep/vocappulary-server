@@ -3,6 +3,7 @@ const app = express();
 const router = express.Router();
 const bodyParser = require('body-parser');
 const db = require('./database/config.js')
+const { checkWords } = require("./database/models")
 
 
 app.use(bodyParser.json({ type: 'application/json'}));
@@ -13,7 +14,7 @@ app.use(bodyParser.json({ type: 'application/json'}));
 
 
 const images = require('./routes/images');
-const textToSpeech = require('./routes/text-to-speech.js')
+const textToSpeech = require('./routes/text-to-speech.js');
 
 
 ///////////////

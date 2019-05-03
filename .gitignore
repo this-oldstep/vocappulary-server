@@ -1,3 +1,9 @@
+#moch data
+moch.js
+
+#temp
+pgadmin4
+
 # Logs
 logs
 *.log
@@ -56,6 +62,7 @@ typings/
 
 # dotenv environment variables file
 .env
+awsdb.env
 
 # next.js build output
 .next
