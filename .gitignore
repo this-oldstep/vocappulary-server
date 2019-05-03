@@ -1,3 +1,10 @@
+#moch data
+mochData
+
+#vsCode Debugger
+.vsCode
+launch.json
+
 # Logs
 logs
 *.log
@@ -56,6 +63,8 @@ typings/
 
 # dotenv environment variables file
 .env
+awsdb.env
+local.env
 
 # next.js build output
 .next
