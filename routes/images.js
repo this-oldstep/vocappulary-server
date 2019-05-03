@@ -2,11 +2,17 @@ require('dotenv').config();
 const express = require('express');
 const router = express.Router();
 const Clarifai = require('clarifai');
+var cloudinary = require('cloudinary').v2;
 
 const app = new Clarifai.App({ apiKey: process.env.CLARIFAI_KEY });
 
 //Get array of probable object names for image
 
+cloudinary.config({
+  cloud_name: 'dlqxzhifw',
+  api_key: '178538482266168',
+  api_secret: 'M_736GqrxNVHQUzBVvf7hcVJObg'
+});
 
 // Flow =>
 // 1.- FE -> image is taken with camera and sent as base64 encoded to cloudinary
@@ -22,16 +28,43 @@ const app = new Clarifai.App({ apiKey: process.env.CLARIFAI_KEY });
 
 router.post('/', (req, res) => {
 
+  let pic = req.body.base64
+  cloudinary.uploader.upload(`data:image/png;base64,${pic}`, function (error, result) {
+    if (error) {
+      console.log(error)
+    }
+    else {
+      const url = result.secure_url
+      app.models.predict(Clarifai.GENERAL_MODEL, url)
+        .then((response) => {
+          res.send(response);
+        }).catch((err) => {
+          console.log(err);
+        });
+    }
+  });
   const url = req.body.url;
 
-  app.models.predict(Clarifai.GENERAL_MODEL, url)
-    .then((response) => {
-      res.send(response);
-    }).catch((err) => {
-      console.log(err);
-    });
-
+  // app.models.predict(Clarifai.GENERAL_MODEL, url)
+  //   .then((response) => {
+  //     res.send(response);
+  //   }).catch((err) => {
+  //     console.log(err);
+  //   });
 });
+
+router.post('/cloud', (req, res)=>{
+  // let pic = req.body.base64
+  // cloudinary.uploader.upload(`data:image/png;base64,${pic}`, function (error, result) { 
+  //   if (error){
+  //     console.log(error)
+  //   }
+  //   else{
+  //     console.log(result) 
+  //   }
+  // });
+
+})
 
 
 module.exports = router;
