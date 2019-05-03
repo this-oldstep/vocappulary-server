@@ -9,9 +9,9 @@ const app = new Clarifai.App({ apiKey: process.env.CLARIFAI_KEY });
 //Get array of probable object names for image
 
 cloudinary.config({
-  cloud_name: 'dlqxzhifw',
-  api_key: '178538482266168',
-  api_secret: 'M_736GqrxNVHQUzBVvf7hcVJObg'
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.API_KEY,
+  api_secret: process.env.API_SECRET
 });
 
 // Flow =>
