@@ -3,6 +3,7 @@ mochData
 
 #vsCode Debugger
 .vsCode
+launch.json
 
 # Logs
 logs

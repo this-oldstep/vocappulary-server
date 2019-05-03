@@ -182,17 +182,17 @@ sequelize
   .sync(/* {force: true} */)
   .then(result => {
     console.log('succesfully connected to database', result);
-    const collection = new Collection
-    const collectionItem = new CollectionItem
-    const user = new User
-    const language = new Language
-    const word = new Word
-    const lession = new Lesson
-    const translation = new Translation
-    Language.findOne({where: {name: "english"}})
-      .then(languages => {
-        return languages
-      })
+    // const collection = new Collection();
+    // const collectionItem = new CollectionItem();
+    // const user = new User();
+    // const language = new Language();
+    // const word = new Word();
+    // const lession = new Lesson();
+    // const translation = new Translation();
+    Word.findAll()
+      .then(rows => {
+        return rows
+      });
   })
   .catch(err => {
     console.log('could not connect to database', err);
