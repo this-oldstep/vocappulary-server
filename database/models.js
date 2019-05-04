@@ -107,10 +107,67 @@ const checkWords = (imageWordList, nativeLanguage) => {
     });
 };
 
-const getCollections = function(){
-  
-}
 
+/**
+ * gets the collection items of a specific collection.
+ * @param {number} collectionId
+ * @returns - returns an object with the collection item ids, image urls, active language, and native language 
+ */
+const getCollectionItems = (collectionId) => {
+  const collectionObject = {}
+  return Collection.findOne({where: {id: collectionId}})
+    .then(collectionCol => {
+      collectionObject.collectionCol = collectionCol;
+      return collectionCol.getUser();
+    })
+    .then(user => {
+      collectionObject.user = user;
+      return collectionId.collectionCol.getCollectionItems();
+    })
+    .then(collectionItems => {
+      collectionObject.collectionItems = collectionItems;
+      collectionItems.map(item => 
+        new Promise((res, rej) => {
+          item.getWord()
+            .then(word => 
+              Translation.findOne({
+                where: {
+                  wordId: word.id,
+                  languageId: collectionObject.user.nativeLanguageId,
+                }
+              })
+            )
+        })
+      )
+      return Promise.all(collectionItems)
+    })
+    .then(nativeTranslations => {
+      collectionObject.nativeTranslations = nativeTranslations;
+      collectionObject.collectionItems.map(item =>
+        new Promise((res, rej) => {
+          item.getWord()
+            .then(word => 
+              Translation.findOne({
+                where: {
+                  wordId: word.id,
+                  languageId: collectionObject.user.currentLanguageId,
+                }
+              })
+            )
+        })
+      )
+      return Promise.all(collectionItems)
+    })
+    .then(currentTranslations => {
+      collectionObject.currentTranslations = currentTranslations;
+      return currentTranslations.map((currentTranslation, index) => ({
+        itemId: collectionObject.collectionItems[index].id,
+        url_image: collectionObject.collectionItems[index].image_url,
+        currentTranslation: currentTranslation.text,
+        nativeTranslation: collectionObject.nativeTranslations[index].text,
+      }))
+    })
+}
 
 
 /**
@@ -175,4 +232,6 @@ module.exports.db = {
   checkWords,
   getTranslation,
   addTranslationToWord,
+  getCollectionItems,
+  makeNewCollectionItem,
 };
