@@ -79,6 +79,7 @@ const Language = sequelize.define('language', {
   name: {
     type: Sequelize.STRING
   },
+  lang_code: Sequelize.STRING,
   flag_url: {
     type: Sequelize.STRING
   },
@@ -186,74 +187,86 @@ sequelize
     const languages = [
       {
           name: 'english',
+          lang_code: 'en',
           flag_url: 'https://lipis.github.io/flag-icon-css/flags/4x3/us.svg',
           active: true,
       },
       {
           name: 'spanish',
+          lang_code: 'es',
           flag_url: 'https://lipis.github.io/flag-icon-css/flags/4x3/es.svg',
           active: true,
       },
       {
           name: 'portugese',
+          lang_code: 'pt',
           flag_url: 'https://lipis.github.io/flag-icon-css/flags/4x3/pt.svg',
           active: true,
       },
       {
           name: 'italian',
+          lang_code: 'it',
           flag_url: 'https://lipis.github.io/flag-icon-css/flags/4x3/it.svg',
           active: true,
       },
       {
           name: 'french',
+          lang_code: 'fr',
           flag_url: 'https://lipis.github.io/flag-icon-css/flags/4x3/fr.svg',
           active: true,
       },
       {
           name: 'german',
+          lang_code: 'de',
           flag_url: 'https://lipis.github.io/flag-icon-css/flags/4x3/de.svg',
           active: true,
       },
       {
           name: 'danish',
+          lang_code: 'da',
           flag_url: 'https://lipis.github.io/flag-icon-css/flags/4x3/dk.svg',
           active: true,
       },
       {
           name: 'swahili',
+          lang_code: 'sw',
           flag_url: 'https://lipis.github.io/flag-icon-css/flags/4x3/ug.svg',
           active: true,
       },
       {
           name: 'tagalog',
+          lang_code: 'tl',
           flag_url: 'https://lipis.github.io/flag-icon-css/flags/4x3/ph.svg',
           active: true,
       },
       {
           name: 'vietnamesse',
+          lang_code: 'vi',
           flag_url: 'https://lipis.github.io/flag-icon-css/flags/4x3/vn.svg',
           active: true,
       },
       {
           name: 'turkish',
+          lang_code: 'tr',
           flag_url: 'https://lipis.github.io/flag-icon-css/flags/4x3/tr.svg',
           active: true,
       },
       {
           name: 'basque',
+          lang_code: 'eu',
           flag_url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/Flag_of_the_Basque_Country.svg/2000px-Flag_of_the_Basque_Country.svg.png',
           active: true,
       },
       {
           name: 'zulu',
+          lang_code: 'zu',
           flag_url: 'https://lipis.github.io/flag-icon-css/flags/4x3/za.svg',
           active: true,
       },
     ];
     const langPromses = languages.map(lang => new Promise((res, rej) => {
         Language.findOrCreate({
-          where: {name: lang.name},
-          defaults: {lang}
+          where: lang,
         })
             .then(rows => res(rows))
     }))
