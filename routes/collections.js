@@ -21,7 +21,7 @@ db.Collection.create({
 
 router.get('/:id', (req, res)=>{
   let userId = req.params.id || 1
-  Collection.findAll({
+  db.Collection.findAll({
     where: {
       userId: userId
 
