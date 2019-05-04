@@ -107,6 +107,11 @@ const checkWords = (imageWordList, nativeLanguage) => {
     });
 };
 
+const getCollections = function(){
+  
+}
+
+
 
 /**
  * 
@@ -161,6 +166,9 @@ const makeNewCollectionItem = (collectionId, image_url, wordId) => {
     },
   });
 };
+
+
+
 
 
 module.exports.db = {

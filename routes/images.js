@@ -110,16 +110,13 @@ router.post('/', (req, res) => {
 
 });
 
-router.post('/cloud', (req, res)=>{
-  // let pic = req.body.base64
-  // cloudinary.uploader.upload(`data:image/png;base64,${pic}`, function (error, result) { 
-  //   if (error){
-  //     console.log(error)
-  //   }
-  //   else{
-  //     console.log(result) 
-  //   }
-  // });
+router.post('/select', (req, res)=>{
+  let text = req.body.text;
+  let wordId = req.params.wordId;
+  let collectionId = req.params.collectionId;
+  let languageId = req.params.languageId;
+  
+  
 
 })
 
