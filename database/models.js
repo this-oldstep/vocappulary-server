@@ -59,7 +59,7 @@ const checkWords = (imageWordList, nativeLanguage) => {
             .then(newWordCols => {
               const allWordCols = wordCols.concat(newWordCols);
               // makes an array of promises to get all the translations
-              const getTranslationPromises = allWordCols.map(word => new Promise((res, req) => {
+              const getTranslationPromises = allWordCols.map(word => new Promise((res, rej) => {
                 word.getWord()
                   .then(language => res(language))
               }));
