@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Clarifai = require('clarifai');
 var cloudinary = require('cloudinary').v2;
+let axios = require('axios');
 
 const app = new Clarifai.App({ apiKey: process.env.CLARIFAI_KEY });
 
@@ -9,11 +10,19 @@ const { db } = require('../database/models');
 //Get array of probable object names for image
 
 // temoprary translator
+
+
 const googleTranslate = (word, from, to) => {
-  let translationPromise = new Promise((res, rej) => {
-    res(word + to);
+  const translatePromise = new Promise((res,rej)=>{
+    axios.get(`https://www.googleapis.com/language/translate/v2?key=${process.env.GOOGLE_TRANS_API}source=${from}&q=${}&target=${to}`)
+    .then((result)=>{
+      res(result)
+    })
+    .catch((err)=>{
+      rej(err)
+    })
   })
-  return translationPromise();
+  return translatePromise();
 };
 
 cloudinary.config({
@@ -30,7 +39,7 @@ cloudinary.config({
 // ----------------
 // 4.- FE -> user goes through array of words to confirm what the object is and sends back selected word to GET /texttospeech
 // 5.- BA -> word has to be translated to language that you're learning at the moment with _____ API
-// 6.- BA -> word is then encoded into ?? sent to s3, get URL 
+// 6.- BA -> word is then encoded into ?? sent to s3, get URL -
 // 7.- BA -> server sends back to client the translated word && the URL for pronunciation && also completes item table in DB
 
 
