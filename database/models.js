@@ -31,7 +31,7 @@ const checkWords = (imageWordList, nativeLanguage) => {
         res(col);
       })
   }));
-  return Language.findOne({where: {name: "english"}})
+  return Language.findOne({where: {name: "en"}})
     .then(engRow => {
       return Promise.all(searchWordPromises)
         .then(wordCols => {
