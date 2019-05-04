@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Clarifai = require('clarifai');
 var cloudinary = require('cloudinary').v2;
+const axios = require('axios');
 
 const app = new Clarifai.App({ apiKey: process.env.CLARIFAI_KEY });
 
@@ -10,15 +11,16 @@ const { db } = require('../database/models');
 
 const googleTranslate = (word, from, to) => {
   const translatePromise = new Promise((res, rej) => {
-    axios.get(`https://www.googleapis.com/language/translate/v2?key=${process.env.GOOGLE_TRANS_API}source=${from}&q=${}&target=${to}`)
+    axios.get(`https://www.googleapis.com/language/translate/v2?key=${process.env.GOOGLE_TRANS_API}&source=${from}&q=${word}&target=${to}`)
       .then((result) => {
-        res(result)
+        const translation = result.data.data.translations[0].translatedText
+        res(translation)
       })
       .catch((err) => {
         rej(err)
       })
   })
-  return translatePromise();
+  return Promise.resolve(translatePromise);
 };
 
 
@@ -44,12 +46,12 @@ router.post('/', (req, res) => {
 
   let pic = req.body.base64
   let {url, nativeLanguage} = req.body
-  // cloudinary.uploader.upload(`data:image/png;base64,${pic}`, function (error, result) {
-  //   if (error) {
-  //     console.log(error)
-  //   }
-  //   else {
-  //     const url = result.secure_url
+  cloudinary.uploader.upload(`data:image/png;base64,${pic}`, function (error, result) {
+    if (error) {
+      console.log(error)
+    }
+    else {
+      const url = result.secure_url
       app.models.predict(Clarifai.GENERAL_MODEL, url)
         .then(({ outputs }) => {
           // gets the array of images from the clarifai object
@@ -64,25 +66,35 @@ router.post('/', (req, res) => {
           // checks words returned by image and returns the words that need translations.
           db.checkWords(imagesArr, nativeLanguage)
             .then(({ completeWords, incompleteWords }) => {
-              const completeTranslationPromises = completeWords.map(word => new Promise((res, rej) => {
-                db.getTranslation(word.id, nativeLanguage)
-                  .then(translationRow => res(translationRow));
-              }));
+              // makes an array of promises to get translation
+              const completeTranslationPromises = completeWords.map(word => 
+                new Promise((res, rej) => {
+                  db.getTranslation(word.id, nativeLanguage)
+                    .then(translationRow => res(translationRow));
+                }
+              ));
+              // runs promises
               return Promise.all(completeTranslationPromises)
                 .then(completeTranslations => {
-                  // a list of promises that add a translation to each incomplete word
-                  const translationPromises = incompleteWords.map(word => new Promise((res, rej) => {
-                    db.getTranslation(word.id, "english")
-                      .then(englishRow => 
-                        googleTranslate(englishRow.text, "en", nativeLanguage)
-                      )
-                      .then(translatedText => 
-                        db.addTranslationToWord(word.id, nativeLanguage, translatedText)
-                      )
-                      .then(translatedRows => {
-                        res(translatedRows);
-                      })
-                  }));
+                  // an array of promises that gets the english translation, translates the word to the native language, stores it in the database, and returns the newly created rows 
+                  const translationPromises = incompleteWords.map(word => 
+                    new Promise((res, rej) => {
+                      db.getTranslation(word.id, "en")
+                        .then(englishRow => {
+                          return googleTranslate(englishRow.text, "en", nativeLanguage)
+                        })
+                        .then(translatedText => {
+                          return db.addTranslationToWord(word.id, nativeLanguage, translatedText)
+                        })
+                        .then(translatedRows => {
+                          res(translatedRows);
+                        })
+                        .catch(err => {
+                          console.error(err);
+                        })
+                    }
+                  ));
+                  // runs promises
                   return Promise.all(translationPromises)
                     .then(newlyCompleteTranslations => {
                       res.send(completeTranslations.concat(newlyCompleteTranslations));
@@ -92,8 +104,8 @@ router.post('/', (req, res) => {
         }).catch((err) => {
           console.log(err);
         });
-  //   }
-  // });
+    }
+  });
 //////////////////////////////////////////////////////////////////////////
 
 });
