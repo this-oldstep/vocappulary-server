@@ -17,8 +17,15 @@ db.Collection.create({
 }).catch((err) => {
   console.log(err);
 });
+});
 
-
+router.get('/:id', (req, res)=>{
+  let userId = req.params.id || 1
+  Collection.findAll({
+    where: {
+      
+    }
+  })
 });
 
 

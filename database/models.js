@@ -93,6 +93,11 @@ const checkWords = (imageWordList, nativeLanguage) => {
     });
 };
 
+const getCollections = function(){
+  
+}
+
+
 module.exports.db = {
   checkWords,
 };

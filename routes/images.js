@@ -11,7 +11,7 @@ const { db } = require('../database/models');
 
 const googleTranslate = (word, from, to) => {
   const translatePromise = new Promise((res, rej) => {
-    axios.get(`https://www.googleapis.com/language/translate/v2?key=${process.env.GOOGLE_TRANS_API}source=${from}&q=${}&target=${to}`)
+    axios.get(`https://www.googleapis.com/language/translate/v2?key=${process.env.GOOGLE_TRANS_API}source=${from}&q=${word}&target=${to}`)
       .then((result) => {
         res(result)
       })
@@ -75,16 +75,13 @@ router.post('/', (req, res) => {
 
 });
 
-router.post('/cloud', (req, res)=>{
-  // let pic = req.body.base64
-  // cloudinary.uploader.upload(`data:image/png;base64,${pic}`, function (error, result) { 
-  //   if (error){
-  //     console.log(error)
-  //   }
-  //   else{
-  //     console.log(result) 
-  //   }
-  // });
+router.post('/select', (req, res)=>{
+  let text = req.body.text;
+  let wordId = req.params.wordId;
+  let collectionId = req.params.collectionId;
+  let languageId = req.params.languageId;
+  
+  
 
 })
 
