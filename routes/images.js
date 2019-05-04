@@ -8,13 +8,19 @@ const app = new Clarifai.App({ apiKey: process.env.CLARIFAI_KEY });
 const { db } = require('../database/models');
 //Get array of probable object names for image
 
-// temoprary translator
 const googleTranslate = (word, from, to) => {
-  let translationPromise = new Promise((res, rej) => {
-    res(word + to);
+  const translatePromise = new Promise((res, rej) => {
+    axios.get(`https://www.googleapis.com/language/translate/v2?key=${process.env.GOOGLE_TRANS_API}source=${from}&q=${}&target=${to}`)
+      .then((result) => {
+        res(result)
+      })
+      .catch((err) => {
+        rej(err)
+      })
   })
-  return translationPromise();
+  return translatePromise();
 };
+
 
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
