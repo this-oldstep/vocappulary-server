@@ -37,13 +37,13 @@ cloudinary.config({
 router.post('/', (req, res) => {
 
   let pic = req.body.base64
-  let {nativeLanguage} = req.body
-  cloudinary.uploader.upload(`data:image/png;base64,${pic}`, function (error, result) {
-    if (error) {
-      console.log(error)
-    }
-    else {
-      const url = result.secure_url
+  let {url, nativeLanguage} = req.body
+  // cloudinary.uploader.upload(`data:image/png;base64,${pic}`, function (error, result) {
+  //   if (error) {
+  //     console.log(error)
+  //   }
+  //   else {
+  //     const url = result.secure_url
       app.models.predict(Clarifai.GENERAL_MODEL, url)
         .then(({ outputs }) => {
           // gets the array of images from the clarifai object
@@ -86,8 +86,8 @@ router.post('/', (req, res) => {
         }).catch((err) => {
           console.log(err);
         });
-    }
-  });
+  //   }
+  // });
 //////////////////////////////////////////////////////////////////////////
 
 });

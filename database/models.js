@@ -31,7 +31,7 @@ const checkWords = (imageWordList, nativeLanguage) => {
         res(col);
       })
   }));
-  return Language.findOne({where: {name: "en"}})
+  return Language.findOne({where: {name: "english"}})
     .then(engRow => {
       return Promise.all(searchWordPromises)
         .then(wordCols => {
@@ -101,9 +101,9 @@ const checkWords = (imageWordList, nativeLanguage) => {
  * @returns - a promise with the language row.
  */
 const getTranslation = (wordId, language) => {
-  return Translation.findOne({name: language})
+  return Language.findOne({where: {name: language}})
     .then(langRow => 
-      word.findOne({wordId, languageId: langRow.id})
+      Translation.findOne({where: {wordId, languageId: langRow.id}})
     )
 }
 
