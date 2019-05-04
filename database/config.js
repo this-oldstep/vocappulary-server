@@ -1,4 +1,3 @@
-require('dotenv').config()
 const Sequelize = require('sequelize');
 
 ////////////////////
@@ -29,9 +28,9 @@ const User = sequelize.define('user', {
     type: Sequelize.STRING,
     allowNull: false
   },
- email: {
-  type: Sequelize.STRING
- },
+  email: {
+    type: Sequelize.STRING
+  },
   points: {
     type: Sequelize.INTEGER
   }
@@ -138,24 +137,31 @@ const Translation = sequelize.define('translation', {
 
 //Language OTM Users - native language //
 User.belongsTo(Language, {as: 'native_language'});
+Language.hasOne(User, {as: 'native_language'});
 
 //Language OTM Users - current language //
- User.belongsTo(Language, {as: 'current_language'});
+User.belongsTo(Language, {as: 'current_language'});
+Language.hasOne(User, {as: 'current_language'});
 
 //User OTM Collections //
 Collection.belongsTo(User);
+User.hasOne(Collection);
 
 //User-Languages MTM //
 User.belongsToMany(Language, { as: 'user', through: { model: Lesson, unique: false }});
+Language.belongsToMany(User, { as: 'user', through: { model: Lesson, unique: false }});
 
 //Words-Languages MTM //
 Word.belongsToMany(Language, {as: 'word', through: {model: Translation, unique: false}});
+Language.belongsToMany(Word, {as: 'word', through: {model: Translation, unique: false}});
 
 //Words OTM Collection Items//
 CollectionItem.belongsTo(Word);
+Word.hasOne(CollectionItem);
 
 //Collection OTM Collection_items //
 CollectionItem.belongsTo(Collection);
+Collection.hasOne(CollectionItem);
 
 
 
@@ -173,7 +179,7 @@ CollectionItem.belongsTo(Collection);
 
 
 sequelize
-  .sync({force: true})
+  .sync(/* {force: true} */)
   .then(result => {
     console.log('succesfully connected to database', result);
   })
