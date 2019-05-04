@@ -93,6 +93,29 @@ const checkWords = (imageWordList, nativeLanguage) => {
     });
 };
 
+/**
+ * adds a trnastlation to a word
+ * @param {number} wordId 
+ * @param {string} language - string of target language
+ * @param {string} translation
+ * @returns - promise with new translation row 
+ */
+const addTranslationToWord = (wordId, language, translation) => {
+  return Language.findOne({where: {name: language}})
+    .then(langCol => {
+      return Translation.findOrCreate({
+        where: {wordId, text: translation},
+        defaults: {wordId, text: translation, languageId: langCol.id}
+      })
+    })
+}
+
+
+addPicToCollection = () => {
+
+}
+
 module.exports.db = {
   checkWords,
+  addTranslationToWord,
 };
