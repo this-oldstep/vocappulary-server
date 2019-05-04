@@ -1,4 +1,3 @@
-require('dotenv').config()
 const Sequelize = require('sequelize');
 
 ////////////////////
@@ -29,9 +28,9 @@ const User = sequelize.define('user', {
     type: Sequelize.STRING,
     allowNull: false
   },
- email: {
-  type: Sequelize.STRING
- },
+  email: {
+    type: Sequelize.STRING
+  },
   points: {
     type: Sequelize.INTEGER
   }
@@ -138,24 +137,31 @@ const Translation = sequelize.define('translation', {
 
 //Language OTM Users - native language //
 User.belongsTo(Language, {as: 'native_language'});
+Language.hasOne(User, {as: 'native_language'});
 
 //Language OTM Users - current language //
- User.belongsTo(Language, {as: 'current_language'});
+User.belongsTo(Language, {as: 'current_language'});
+Language.hasOne(User, {as: 'current_language'});
 
 //User OTM Collections //
 Collection.belongsTo(User);
+User.hasOne(Collection);
 
 //User-Languages MTM //
 User.belongsToMany(Language, { as: 'user', through: { model: Lesson, unique: false }});
+Language.belongsToMany(User, { as: 'user', through: { model: Lesson, unique: false }});
 
 //Words-Languages MTM //
 Word.belongsToMany(Language, {as: 'word', through: {model: Translation, unique: false}});
+Language.belongsToMany(Word, {as: 'word', through: {model: Translation, unique: false}});
 
 //Words OTM Collection Items//
 CollectionItem.belongsTo(Word);
+Word.hasOne(CollectionItem);
 
 //Collection OTM Collection_items //
 CollectionItem.belongsTo(Collection);
+Collection.hasOne(CollectionItem);
 
 
 
@@ -173,9 +179,85 @@ CollectionItem.belongsTo(Collection);
 
 
 sequelize
-  .sync({force: true})
+  .sync(/* {force: true} */)
   .then(result => {
     console.log('succesfully connected to database', result);
+    // adds languages if they do not exist
+    const languages = [
+      {
+          name: 'english',
+          flag_url: 'https://lipis.github.io/flag-icon-css/flags/4x3/us.svg',
+          active: true,
+      },
+      {
+          name: 'spanish',
+          flag_url: 'https://lipis.github.io/flag-icon-css/flags/4x3/es.svg',
+          active: true,
+      },
+      {
+          name: 'portugese',
+          flag_url: 'https://lipis.github.io/flag-icon-css/flags/4x3/pt.svg',
+          active: true,
+      },
+      {
+          name: 'italian',
+          flag_url: 'https://lipis.github.io/flag-icon-css/flags/4x3/it.svg',
+          active: true,
+      },
+      {
+          name: 'french',
+          flag_url: 'https://lipis.github.io/flag-icon-css/flags/4x3/fr.svg',
+          active: true,
+      },
+      {
+          name: 'german',
+          flag_url: 'https://lipis.github.io/flag-icon-css/flags/4x3/de.svg',
+          active: true,
+      },
+      {
+          name: 'danish',
+          flag_url: 'https://lipis.github.io/flag-icon-css/flags/4x3/dk.svg',
+          active: true,
+      },
+      {
+          name: 'swahili',
+          flag_url: 'https://lipis.github.io/flag-icon-css/flags/4x3/ug.svg',
+          active: true,
+      },
+      {
+          name: 'tagalog',
+          flag_url: 'https://lipis.github.io/flag-icon-css/flags/4x3/ph.svg',
+          active: true,
+      },
+      {
+          name: 'vietnamesse',
+          flag_url: 'https://lipis.github.io/flag-icon-css/flags/4x3/vn.svg',
+          active: true,
+      },
+      {
+          name: 'turkish',
+          flag_url: 'https://lipis.github.io/flag-icon-css/flags/4x3/tr.svg',
+          active: true,
+      },
+      {
+          name: 'basque',
+          flag_url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/Flag_of_the_Basque_Country.svg/2000px-Flag_of_the_Basque_Country.svg.png',
+          active: true,
+      },
+      {
+          name: 'zulu',
+          flag_url: 'https://lipis.github.io/flag-icon-css/flags/4x3/za.svg',
+          active: true,
+      },
+    ];
+    const langPromses = languages.map(lang => new Promise((res, rej) => {
+        Language.findOrCreate({
+          where: {name: lang.name},
+          defaults: {lang}
+        })
+            .then(rows => res(rows))
+    }))
+    return Promise.all(langPromses);
   })
   .catch(err => {
     console.log('could not connect to database', err);
