@@ -6,7 +6,7 @@ const {
   Word, 
   Lesson, 
   Translation,
-} = require("./config")
+} = require("./config");
 
 
 
@@ -93,6 +93,21 @@ const checkWords = (imageWordList, nativeLanguage) => {
     });
 };
 
+
+/**
+ * 
+ * @param {number} wordId 
+ * @param {string} language 
+ * @returns - a promise with the language row.
+ */
+const getTranslation = (wordId, language) => {
+  return Translation.findOne({name: language})
+    .then(langRow => 
+      word.findOne({wordId, languageId: langRow.id})
+    )
+}
+
+
 /**
  * adds a trnastlation to a word
  * @param {number} wordId 
@@ -108,14 +123,10 @@ const addTranslationToWord = (wordId, language, translation) => {
         defaults: {wordId, text: translation, languageId: langCol.id}
       })
     })
-}
-
-
-addPicToCollection = () => {
-
-}
+};
 
 module.exports.db = {
   checkWords,
+  getTranslation,
   addTranslationToWord,
 };
