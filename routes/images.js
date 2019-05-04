@@ -2,12 +2,18 @@ require('dotenv').config();
 const express = require('express');
 const router = express.Router();
 const Clarifai = require('clarifai');
+var cloudinary = require('cloudinary').v2;
 
 const app = new Clarifai.App({ apiKey: process.env.CLARIFAI_KEY });
 
 const { db } = require('../database/models');
 //Get array of probable object names for image
 
+cloudinary.config({
+  cloud_name: process.env.CLOUD_NAME,
+  api_key: process.env.API_KEY,
+  api_secret: process.env.API_SECRET
+});
 
 // Flow =>
 // 1.- FE -> image is taken with camera and sent as base64 encoded to cloudinary
@@ -23,28 +29,50 @@ const { db } = require('../database/models');
 
 router.post('/', (req, res) => {
 
-  const {url, nativeLanguage} = req.body;
-
-  app.models.predict(Clarifai.GENERAL_MODEL, url)
-    .then(({ outputs }) => {
-      // gets the array of images from the clarifai object
-      const { concepts } = outputs[0].data;
-      // maps and filters the clarifai object down to the first five strings related to the image ignoring all "no person" strings
-      const imagesArr = concepts.reduce((seed, conceptData) => {
-        if(conceptData.name !== "no person" && seed.length < 5) {
-          seed.push(conceptData.name)
-        }
-        return seed;
-      }, [])
-      db.checkWords(imagesArr, nativeLanguage)
-        .then(({ completeWords, incompleteWords }) => {
-          res.send({completeWords, incompleteWords});
-        })
-    }).catch((err) => {
-      console.log(err);
-    });
+  let pic = req.body.base64
+  let {nativeLanguage} = req.body
+  cloudinary.uploader.upload(`data:image/png;base64,${pic}`, function (error, result) {
+    if (error) {
+      console.log(error)
+    }
+    else {
+      const url = result.secure_url
+      app.models.predict(Clarifai.GENERAL_MODEL, url)
+        .then(({ outputs }) => {
+          // gets the array of images from the clarifai object
+          const { concepts } = outputs[0].data;
+          // maps and filters the clarifai object down to the first five strings related to the image ignoring all "no person" strings
+          const imagesArr = concepts.reduce((seed, conceptData) => {
+            if (conceptData.name !== "no person" && seed.length < 5) {
+              seed.push(conceptData.name)
+            }
+            return seed;
+          }, [])
+          db.checkWords(imagesArr, nativeLanguage)
+            .then(({ completeWords, incompleteWords }) => {
+              res.send({ completeWords, incompleteWords });
+            })
+        }).catch((err) => {
+          console.log(err);
+        });
+    }
+  });
+//////////////////////////////////////////////////////////////////////////
 
 });
+
+router.post('/cloud', (req, res)=>{
+  // let pic = req.body.base64
+  // cloudinary.uploader.upload(`data:image/png;base64,${pic}`, function (error, result) { 
+  //   if (error){
+  //     console.log(error)
+  //   }
+  //   else{
+  //     console.log(result) 
+  //   }
+  // });
+
+})
 
 
 module.exports = router;
