@@ -148,6 +148,20 @@ const addTranslationToWord = (wordId, language, translation) => {
     })
 };
 
+const makeNewCollectionItem = (collectionId, image_url, wordId) => {
+  return CollectionItem.findOrCreate({
+    where: {
+      collectionId,
+      wordId,
+    },
+    defaults: {
+      collectionId,
+      image_url,
+      wordId,
+    },
+  });
+};
+
 
 module.exports.db = {
   checkWords,
