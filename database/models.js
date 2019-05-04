@@ -107,13 +107,11 @@ const checkWords = (imageWordList, nativeLanguage) => {
     });
 };
 
-<<<<<<< HEAD
 const getCollections = function(){
   
 }
 
 
-=======
 
 /**
  * 
@@ -155,8 +153,18 @@ const addTranslationToWord = (wordId, language, translation) => {
     })
 };
 
+const getCollections = function(userId){
+  userId = 1
+  Collection.findAll({
+    where: {
+      userId: userId
+    }
+  })
+}
 
->>>>>>> 7f7a06a49a57d8fb66f478cc4fd427319c728e22
+
+
+
 module.exports.db = {
   checkWords,
   getTranslation,
