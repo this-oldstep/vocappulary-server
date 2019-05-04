@@ -153,14 +153,6 @@ const addTranslationToWord = (wordId, language, translation) => {
     })
 };
 
-const getCollections = function(userId){
-  userId = 1
-  Collection.findAll({
-    where: {
-      userId: userId
-    }
-  })
-}
 
 
 

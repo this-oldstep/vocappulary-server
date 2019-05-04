@@ -23,8 +23,15 @@ router.get('/:id', (req, res)=>{
   let userId = req.params.id || 1
   Collection.findAll({
     where: {
-      
+      userId: userId
+
     }
+  })
+  .then((result)=>{
+    res.send(result)
+  })
+  .catch((err)=>{
+    res.send(err)
   })
 });
 
