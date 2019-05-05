@@ -10,14 +10,20 @@ admin.initializeApp({
 });
 
 router.post('/', (req, res) => {
-  const idToken = req.body.idToken;
+  const idToken = req.body.token;
   admin.auth().verifyIdToken(idToken)
     .then((decodedToken) => {
-      const uid = decodedToken.uid;
+      const { uid } = decodedToken;
       console.log(uid);
+      res.send(decodedToken);
     }).catch((error) => {
       console.log(error);
     });
+});
+
+router.get('/', (req, res) => {
+  console.log(req);
+  res.send('yhhharr');
 });
 
 module.exports = router;
