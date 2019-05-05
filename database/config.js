@@ -149,7 +149,7 @@ Language.hasOne(User, {as: 'current_language'});
 
 //User OTM Collections //
 Collection.belongsTo(User);
-User.hasOne(Collection);
+User.hasMany(Collection);
 
 //User-Languages MTM //
 User.belongsToMany(Language, { as: 'user', through: { model: Lesson, unique: false }});
@@ -165,7 +165,7 @@ Word.hasOne(CollectionItem);
 
 //Collection OTM Collection_items //
 CollectionItem.belongsTo(Collection);
-Collection.hasOne(CollectionItem);
+Collection.hasMany(CollectionItem);
 
 
 
@@ -183,7 +183,7 @@ Collection.hasOne(CollectionItem);
 
 
 sequelize
-  .sync({force: true})
+  .sync(/* {force: true} */)
   .then(result => {
     console.log('succesfully connected to database', result);
     // adds languages if they do not exist
@@ -274,6 +274,10 @@ sequelize
             .then(rows => res(rows))
     }))
     return Promise.all(langPromses);
+  })
+  .then(() => {
+    // adds moch data
+    // require("../mochData/moch")()
   })
   .catch(err => {
     console.log('could not connect to database', err);

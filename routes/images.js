@@ -2,26 +2,13 @@ const express = require('express');
 const router = express.Router();
 const Clarifai = require('clarifai');
 var cloudinary = require('cloudinary').v2;
-const axios = require('axios');
+// const axios = require('axios');
+const { googleTranslate } = require('../apiHelpers');
 
 const app = new Clarifai.App({ apiKey: process.env.CLARIFAI_KEY });
 
 const { db } = require('../database/models');
 //Get array of probable object names for image
-
-const googleTranslate = (word, from, to) => {
-  const translatePromise = new Promise((res, rej) => {
-    axios.get(`https://www.googleapis.com/language/translate/v2?key=${process.env.GOOGLE_TRANS_API}&source=${from}&q=${word}&target=${to}`)
-      .then((result) => {
-        const translation = result.data.data.translations[0].translatedText
-        res(translation)
-      })
-      .catch((err) => {
-        rej(err)
-      })
-  })
-  return Promise.resolve(translatePromise);
-};
 
 
 cloudinary.config({
@@ -45,8 +32,7 @@ cloudinary.config({
 router.post('/', (req, res) => {
 
   let pic = req.body.base64
-  // let {nativeLanguage} = req.body
-  let nativeLanguage  = 'es'
+  let {nativeLanguage} = req.body
   let url;
   cloudinary.uploader.upload(`data:image/png;base64,${pic}`, function (error, result) {
     if (error) {
@@ -103,13 +89,9 @@ router.post('/', (req, res) => {
                         return {
                           wordId: langRow.wordId,
                           translationId: langRow.id,
-                          languageId: langRow.id,
+                          languageId: langRow.languageId,
                           text: langRow.text
                         };
-                        dataObj.wordId = langRow.wordId;
-                        dataObj.translationId = langRow.id;
-                        dataObj.languageId = langRow.id;
-                        return dataObj
                       })
                       res.send({ 
                         data: allData,
@@ -123,8 +105,6 @@ router.post('/', (req, res) => {
         });
     }
   });
-//////////////////////////////////////////////////////////////////////////
-
 });
 
 
