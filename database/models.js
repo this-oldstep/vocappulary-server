@@ -338,7 +338,8 @@ const createCollection = (userId, name, public = false) => {
  * @param {number} userId
  * @returns - object containing the collection rows
  */
-const getAllCollections = userId => Collection.findAll({where: {userId}})
+const getAllCollections = userId => 
+  Collection.findAll({where: {userId}})
 
 
 
@@ -346,6 +347,15 @@ const getAllCollections = userId => Collection.findAll({where: {userId}})
  * @returns all language rows
  */
 const getAllLanguages = () => Language.findAll();
+
+
+const makeUser = (username, email, currentLanguageId, nativeLanguageId) => 
+  User.create({username, email, currentLanguageId, nativeLanguageId})
+
+
+const findUser = (username) => 
+  User.findOne({where: {username}})
+
 
 
 module.exports.db = {
@@ -358,4 +368,6 @@ module.exports.db = {
   createCollection,
   getAllCollections,
   getAllLanguages,
+  makeUser,
+  findUser,
 };
