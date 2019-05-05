@@ -283,8 +283,19 @@ const makeNewCollectionItem = (collectionId, image_url, wordId) => {
     })
 };
 
-// makeNewCollectionItem(1, "lmao.com", 4)
 
+
+const createCollection = (userId, name, public = false) => {
+  return Collection.create({
+    name,
+    public,
+    count: 0,
+    userId,
+  })
+}
+
+
+const getAllCollections = userId => Collection.findAll({where: {userId}})
 
 
 module.exports.db = {
@@ -293,5 +304,7 @@ module.exports.db = {
   addTranslationToWord,
   getAllCollectionItems,
   makeNewCollectionItem,
-  selectWord
+  selectWord,
+  createCollection,
+  getAllCollections,
 };
