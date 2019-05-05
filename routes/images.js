@@ -41,17 +41,19 @@ cloudinary.config({
 // 6.- BA -> word is then encoded into ?? sent to s3, get URL 
 // 7.- BA -> server sends back to client the translated word && the URL for pronunciation && also completes item table in DB
 
-
+//returns translation columns in the native language from the database, and takes the pic 
 router.post('/', (req, res) => {
 
   let pic = req.body.base64
-  let {url, nativeLanguage} = req.body
+  // let {nativeLanguage} = req.body
+  let nativeLanguage  = 'es'
+  let url;
   cloudinary.uploader.upload(`data:image/png;base64,${pic}`, function (error, result) {
     if (error) {
       console.log(error)
     }
     else {
-      const url = result.secure_url
+      url = result.secure_url
       app.models.predict(Clarifai.GENERAL_MODEL, url)
         .then(({ outputs }) => {
           // gets the array of images from the clarifai object
@@ -97,7 +99,22 @@ router.post('/', (req, res) => {
                   // runs promises
                   return Promise.all(translationPromises)
                     .then(newlyCompleteTranslations => {
-                      res.send(completeTranslations.concat(newlyCompleteTranslations));
+                      let allData = completeTranslations.concat(newlyCompleteTranslations).map((langRow)=>{
+                        return {
+                          wordId: langRow.wordId,
+                          translationId: langRow.id,
+                          languageId: langRow.id,
+                          text: langRow.text
+                        };
+                        dataObj.wordId = langRow.wordId;
+                        dataObj.translationId = langRow.id;
+                        dataObj.languageId = langRow.id;
+                        return dataObj
+                      })
+                      res.send({ 
+                        data: allData,
+                        imgUrl: url
+                      });
                     });
                 });
             });
@@ -110,15 +127,24 @@ router.post('/', (req, res) => {
 
 });
 
-router.post('/select', (req, res)=>{
-  let text = req.body.text;
+
+// ROUTE TO SELECT A PHOTO FROM SELECTION
+router.post('/select/:wordId/:collectionId', (req, res)=>{
+  // let text = req.body.text;
   let wordId = req.params.wordId;
   let collectionId = req.params.collectionId;
-  let languageId = req.params.languageId;
+  let url = req.body.url
+  db.selectWord(wordId, collectionId, url)
+    .then((result)=>{
+      res.send(result)
+    })
+    .catch((err)=>{
+      res.send(err)
+    })
+  })
   
   
 
-})
 
 
 module.exports = router;

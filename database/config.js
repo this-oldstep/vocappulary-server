@@ -45,6 +45,9 @@ const Collection = sequelize.define('collection', {
     allowNull: false,
     primaryKey: true
   },
+  name: {
+    type: Sequelize.STRING
+  },
   public: {
     type: Sequelize.BOOLEAN
   },
@@ -180,7 +183,7 @@ Collection.hasMany(CollectionItem);
 
 
 sequelize
-  .sync(/* {force: true} */)
+  .sync({force: true})
   .then(result => {
     console.log('succesfully connected to database', result);
     // adds languages if they do not exist
