@@ -99,8 +99,20 @@ router.post('/', (req, res) => {
                   // runs promises
                   return Promise.all(translationPromises)
                     .then(newlyCompleteTranslations => {
+                      let allData = completeTranslations.concat(newlyCompleteTranslations).map((langRow)=>{
+                        return {
+                          wordId: langRow.wordId,
+                          translationId: langRow.id,
+                          languageId: langRow.id,
+                          text: langRow.text
+                        };
+                        dataObj.wordId = langRow.wordId;
+                        dataObj.translationId = langRow.id;
+                        dataObj.languageId = langRow.id;
+                        return dataObj
+                      })
                       res.send({ 
-                        data: completeTranslations.concat(newlyCompleteTranslations),
+                        data: allData,
                         imgUrl: url
                       });
                     });
