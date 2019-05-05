@@ -23,6 +23,11 @@ const googleTranslate = (word, from, to) => {
 };
 
 
+const googleTextToSpeech = () => {
+  
+}
+
+
 module.exports = {
   googleTranslate,
 }
