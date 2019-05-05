@@ -8,6 +8,8 @@ const {
   Translation,
 } = require("./config");
 
+const { googleTranslate } = require('../apiHelpers');
+
 
 
 /**
@@ -107,12 +109,83 @@ const checkWords = (imageWordList, nativeLanguage) => {
     });
 };
 
+
+
 const selectWord = function(wordId, collectionId, imgUrl){
   return CollectionItem.create({
     collectionId: collectionId,
     wordId: wordId,
     image_url: imgUrl,
   })
+}
+
+
+
+/**
+ * gets the collection items of a specific collection.
+ * @param {number} collectionId
+ * @returns - returns an object with the collection item ids, image urls, active language, and native language 
+ */
+const getAllCollectionItems = (collectionId) => {
+  const collectionObject = {}
+  return Collection.findOne({where: {id: collectionId}})
+    .then(collectionCol => {
+      collectionObject.collectionCol = collectionCol;
+      return collectionCol.getUser();
+    })
+    .then(user => {
+      collectionObject.user = user;
+      return collectionObject.collectionCol.getCollection_items();
+    })
+    .then(collectionItems => {
+      collectionObject.collectionItems = collectionItems;
+      const translationPromises = collectionItems.map(item => 
+        new Promise((res, rej) => {
+          item.getWord()
+            .then(word => 
+              Translation.findOne({
+                where: {
+                  wordId: word.id,
+                  languageId: collectionObject.user.nativeLanguageId,
+                }
+              })
+            )
+            .then(transations => {
+              res(transations)
+            })
+        })
+      )
+      return Promise.all(translationPromises)
+    })
+    .then(nativeTranslations => {
+      collectionObject.nativeTranslations = nativeTranslations;
+      const getWordPromises = collectionObject.collectionItems.map(item =>
+        new Promise((res, rej) => {
+          item.getWord()
+            .then(word => 
+              Translation.findOne({
+                where: {
+                  wordId: word.id,
+                  languageId: collectionObject.user.currentLanguageId,
+                }
+              })
+            )
+            .then(transations => {
+              res(transations);
+            })
+        })
+      )
+      return Promise.all(getWordPromises);
+    })
+    .then(currentTranslations => {
+      collectionObject.currentTranslations = currentTranslations;
+      return currentTranslations.map((currentTranslation, index) => ({
+        itemId: collectionObject.collectionItems[index].id,
+        url_image: collectionObject.collectionItems[index].image_url,
+        currentTranslation: currentTranslation.text,
+        nativeTranslation: collectionObject.nativeTranslations[index].text,
+      }))
+    })
 }
 
 
@@ -129,6 +202,7 @@ const getTranslation = (wordId, language) => {
       Translation.findOne({where: {wordId, languageId: langRow.id}})
     )
 }
+
 
 
 /**
@@ -159,11 +233,129 @@ const addTranslationToWord = (wordId, language, translation) => {
 
 
 
+/**
+ * Adds translation of word if possible, adds a count to the collection count, and creates a new collection item
+ * @param {number} collectionId 
+ * @param {string} image_url 
+ * @param {number} wordId 
+ * @returns an object with image_url and currentLangText. The currentLangText is the language of the text they are learning.
+ */
+const makeNewCollectionItem = (collectionId, image_url, wordId) => {
+  const collectionItemObj = {};
+  return Collection.findOne({id: collectionId})
+    .then(collectionCol => {
+      collectionItemObj.collectionCol = collectionCol;
+      return collectionCol.getUser()
+    })
+    .then(userCol => {
+      return userCol.getCurrent_language()
+    })
+    .then(currentLanguageRow => {
+      collectionItemObj.currentLanguageRow = currentLanguageRow;
+      return Translation.findOne({
+        where: {
+          wordId,
+          languageId: currentLanguageRow.id,
+        }
+      })
+    })
+    .then(translatedRow => {
+      if(translatedRow) {
+        return translatedRow
+      } else {
+        return Language.findOne({
+          where: {
+            name: "english",
+          }
+        })
+        .then(englishRow => {
+          collectionItemObj.englishRow = englishRow
+          return Translation.findOne({
+            where: {
+              wordId,
+              languageId: englishRow.id
+            }
+          })
+        })
+        .then(engTranslation => {
+          return googleTranslate(engTranslation.text, collectionItemObj.englishRow.lang_code, collectionItemObj.currentLanguageRow.lang_code)
+        })
+        .then(translatedText => {
+          return Translation.create({
+            text: translatedText,
+            wordId,
+            languageId: collectionItemObj.currentLanguageRow.id,
+          })
+        })
+      }
+    })
+    .then(translatedRow => {
+      collectionItemObj.translatedRow = translatedRow;
+      return CollectionItem.create({
+        image_url,
+        wordId,
+        collectionId,
+      })
+    })
+    .then(collectionItemRow => {
+      collectionItemObj.collectionCol.update({
+        count: collectionItemObj.collectionCol.count + 1,
+      }, {
+        fields: ['count'],
+      })
+      return {
+        image_url,
+        currentLangText: collectionItemObj.translatedRow.text,
+      }
+    })
+    .catch(err => {
+      console.error(err);
+    })
+};
+
+
+
+/**
+ * makes a collection
+ * @param {number} userId 
+ * @param {string} name 
+ * @param {boolean} public - optional
+ * @returns collection row
+ */
+const createCollection = (userId, name, public = false) => {
+  return Collection.create({
+    name,
+    public,
+    count: 0,
+    userId,
+  })
+}
+
+
+
+/**
+ * gets all collections by userId
+ * @param {number} userId
+ * @returns - object containing the collection rows
+ */
+const getAllCollections = userId => Collection.findAll({where: {userId}})
+
+
+
+/**
+ * @returns all language rows
+ */
+const getAllLanguages = () => Language.findAll();
 
 
 module.exports.db = {
   checkWords,
   getTranslation,
   addTranslationToWord,
-  selectWord
+  getAllCollectionItems,
+  makeNewCollectionItem,
+  selectWord,
+  createCollection,
+  getAllCollections,
+  getAllLanguages,
 };
