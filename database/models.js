@@ -242,7 +242,7 @@ const addTranslationToWord = (wordId, language, translation) => {
  */
 const makeNewCollectionItem = (collectionId, image_url, wordId) => {
   const collectionItemObj = {};
-  return Collection.findOne({id: collectionId})
+  return Collection.findOne({where: {id: collectionId}})
     .then(collectionCol => {
       collectionItemObj.collectionCol = collectionCol;
       return collectionCol.getUser()
