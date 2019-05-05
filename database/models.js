@@ -107,6 +107,15 @@ const checkWords = (imageWordList, nativeLanguage) => {
     });
 };
 
+const selectWord = function(wordId, collectionId, imgUrl){
+  return CollectionItem.create({
+    collectionId: collectionId,
+    wordId: wordId,
+    image_url: imgUrl,
+  })
+}
+
+
 
 /**
  * 
@@ -149,8 +158,12 @@ const addTranslationToWord = (wordId, language, translation) => {
 };
 
 
+
+
+
 module.exports.db = {
   checkWords,
   getTranslation,
   addTranslationToWord,
+  selectWord
 };
