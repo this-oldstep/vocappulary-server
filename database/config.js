@@ -180,7 +180,7 @@ Collection.hasMany(CollectionItem);
 
 
 sequelize
-  .sync({force: true})
+  .sync(/* {force: true} */)
   .then(result => {
     console.log('succesfully connected to database', result);
     // adds languages if they do not exist
@@ -271,6 +271,10 @@ sequelize
             .then(rows => res(rows))
     }))
     return Promise.all(langPromses);
+  })
+  .then(() => {
+    // adds moch data
+    // require("../mochData/moch")()
   })
   .catch(err => {
     console.log('could not connect to database', err);

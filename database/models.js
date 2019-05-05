@@ -113,7 +113,7 @@ const checkWords = (imageWordList, nativeLanguage) => {
  * @param {number} collectionId
  * @returns - returns an object with the collection item ids, image urls, active language, and native language 
  */
-const getCollectionItems = (collectionId) => {
+const getAllCollectionItems = (collectionId) => {
   const collectionObject = {}
   return Collection.findOne({where: {id: collectionId}})
     .then(collectionCol => {
@@ -122,11 +122,11 @@ const getCollectionItems = (collectionId) => {
     })
     .then(user => {
       collectionObject.user = user;
-      return collectionId.collectionCol.getCollectionItems();
+      return collectionObject.collectionCol.getCollection_items();
     })
     .then(collectionItems => {
       collectionObject.collectionItems = collectionItems;
-      collectionItems.map(item => 
+      const translationPromises = collectionItems.map(item => 
         new Promise((res, rej) => {
           item.getWord()
             .then(word => 
@@ -137,13 +137,16 @@ const getCollectionItems = (collectionId) => {
                 }
               })
             )
+            .then(transations => {
+              res(transations)
+            })
         })
       )
-      return Promise.all(collectionItems)
+      return Promise.all(translationPromises)
     })
     .then(nativeTranslations => {
       collectionObject.nativeTranslations = nativeTranslations;
-      collectionObject.collectionItems.map(item =>
+      const getWordPromises = collectionObject.collectionItems.map(item =>
         new Promise((res, rej) => {
           item.getWord()
             .then(word => 
@@ -154,9 +157,12 @@ const getCollectionItems = (collectionId) => {
                 }
               })
             )
+            .then(transations => {
+              res(transations);
+            })
         })
       )
-      return Promise.all(collectionItems)
+      return Promise.all(getWordPromises);
     })
     .then(currentTranslations => {
       collectionObject.currentTranslations = currentTranslations;
@@ -232,6 +238,6 @@ module.exports.db = {
   checkWords,
   getTranslation,
   addTranslationToWord,
-  getCollectionItems,
+  getAllCollectionItems,
   makeNewCollectionItem,
 };

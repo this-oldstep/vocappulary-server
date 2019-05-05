@@ -5,8 +5,6 @@ const router = express.Router();
 const bodyParser = require('body-parser');
 const db = require('./database/config.js')
 const { checkWords } = require("./database/models")
-// adds moch data
-// require("./mochData/moch")()
 
 
 app.use(bodyParser.json({ type: 'application/json'}));
