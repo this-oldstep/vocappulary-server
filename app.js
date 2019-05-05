@@ -3,8 +3,7 @@ const express = require('express');
 const app = express();
 const router = express.Router();
 const bodyParser = require('body-parser');
-const db = require('./database/config.js')
-const { checkWords } = require("./database/models")
+const { db } = require("./database/models")
 
 
 app.use(bodyParser.json({ type: 'application/json'}));
@@ -28,6 +27,17 @@ app.use('/collectionItems', collectionItems)
 
 
 ///////////////
+
+
+/**
+ * returns all languages
+ */
+app.get('/languages', (req, res) => {
+  db.getAllLanguages()
+    .then(languages => {
+      res.json(languages);
+    })
+})
 
 
 app.get('/', (req, res) => res.send('Hello World!'));

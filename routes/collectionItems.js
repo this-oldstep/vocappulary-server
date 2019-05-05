@@ -4,6 +4,10 @@ const router = express.Router();
 const { db } = require('../database/models.js');
 
 
+/**
+ * takes collectionId
+ * gets an array of all the collection items of a collection with their native transltion, current translation, collectionItemId, and image url
+ */
 router.get('/', (req,res)=>{
   db.getAllCollectionItems(req.body.collectionId)
     .then(collection => {
@@ -15,6 +19,10 @@ router.get('/', (req,res)=>{
     });
 })
 
+/**
+ * takes collectionId, imgUrl, and wordId
+ * creates a new collection item, and adds a translation of the word if nessisary
+ */
 router.post('/', (req,res) => {
   const { collectionId, imgUrl, wordId } = req.body;
   db.makeNewCollectionItem(collectionId, imgUrl, wordId)

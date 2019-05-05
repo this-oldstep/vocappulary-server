@@ -4,7 +4,10 @@ const router = express.Router();
 const { db } = require('../database/models.js')
 
 
-
+/**
+ * takes name, userId, and public
+ * creates a new collection
+ */
 router.post('/', (req, res) => {
 
   const { name, userId, public } = req.body;
@@ -17,8 +20,14 @@ router.post('/', (req, res) => {
   });
 });
 
+/**
+ * takes userId
+ * gets all collections related to a user
+ */
 router.get('/', (req, res)=>{
-  let { userId, } = req.body
+  
+  let { userId } = req.body
+  
   db.getAllCollections(userId)
   .then((result)=>{
     res.json(result)

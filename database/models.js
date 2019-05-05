@@ -109,6 +109,8 @@ const checkWords = (imageWordList, nativeLanguage) => {
     });
 };
 
+
+
 const selectWord = function(wordId, collectionId, imgUrl){
   return CollectionItem.create({
     collectionId: collectionId,
@@ -116,6 +118,8 @@ const selectWord = function(wordId, collectionId, imgUrl){
     image_url: imgUrl,
   })
 }
+
+
 
 /**
  * gets the collection items of a specific collection.
@@ -185,6 +189,7 @@ const getAllCollectionItems = (collectionId) => {
 }
 
 
+
 /**
  * 
  * @param {number} wordId 
@@ -197,6 +202,7 @@ const getTranslation = (wordId, language) => {
       Translation.findOne({where: {wordId, languageId: langRow.id}})
     )
 }
+
 
 
 /**
@@ -227,6 +233,13 @@ const addTranslationToWord = (wordId, language, translation) => {
 
 
 
+/**
+ * Adds translation of word if possible, adds a count to the collection count, and creates a new collection item
+ * @param {number} collectionId 
+ * @param {string} image_url 
+ * @param {number} wordId 
+ * @returns an object with image_url and currentLangText. The currentLangText is the language of the text they are learning.
+ */
 const makeNewCollectionItem = (collectionId, image_url, wordId) => {
   const collectionItemObj = {};
   return Collection.findOne({id: collectionId})
@@ -239,30 +252,42 @@ const makeNewCollectionItem = (collectionId, image_url, wordId) => {
     })
     .then(currentLanguageRow => {
       collectionItemObj.currentLanguageRow = currentLanguageRow;
-      return Language.findOne({
-        where: {
-          name: "english",
-        }
-      })
-    })
-    .then(englishRow => {
-      collectionItemObj.englishRow = englishRow
       return Translation.findOne({
         where: {
           wordId,
-          languageId: englishRow.id
+          languageId: currentLanguageRow.id,
         }
       })
     })
-    .then(engTranslation => {
-      return googleTranslate(engTranslation.text, collectionItemObj.englishRow.lang_code, collectionItemObj.currentLanguageRow.lang_code)
-    })
-    .then(translatedText => {
-      return Translation.create({
-        text: translatedText,
-        wordId,
-        languageId: collectionItemObj.currentLanguageRow.id,
-      })
+    .then(translatedRow => {
+      if(translatedRow) {
+        return translatedRow
+      } else {
+        return Language.findOne({
+          where: {
+            name: "english",
+          }
+        })
+        .then(englishRow => {
+          collectionItemObj.englishRow = englishRow
+          return Translation.findOne({
+            where: {
+              wordId,
+              languageId: englishRow.id
+            }
+          })
+        })
+        .then(engTranslation => {
+          return googleTranslate(engTranslation.text, collectionItemObj.englishRow.lang_code, collectionItemObj.currentLanguageRow.lang_code)
+        })
+        .then(translatedText => {
+          return Translation.create({
+            text: translatedText,
+            wordId,
+            languageId: collectionItemObj.currentLanguageRow.id,
+          })
+        })
+      }
     })
     .then(translatedRow => {
       collectionItemObj.translatedRow = translatedRow;
@@ -273,6 +298,11 @@ const makeNewCollectionItem = (collectionId, image_url, wordId) => {
       })
     })
     .then(collectionItemRow => {
+      collectionItemObj.collectionCol.update({
+        count: collectionItemObj.collectionCol.count + 1,
+      }, {
+        fields: ['count'],
+      })
       return {
         image_url,
         currentLangText: collectionItemObj.translatedRow.text,
@@ -285,6 +315,13 @@ const makeNewCollectionItem = (collectionId, image_url, wordId) => {
 
 
 
+/**
+ * makes a collection
+ * @param {number} userId 
+ * @param {string} name 
+ * @param {boolean} public - optional
+ * @returns collection row
+ */
 const createCollection = (userId, name, public = false) => {
   return Collection.create({
     name,
@@ -295,7 +332,20 @@ const createCollection = (userId, name, public = false) => {
 }
 
 
+
+/**
+ * gets all collections by userId
+ * @param {number} userId
+ * @returns - object containing the collection rows
+ */
 const getAllCollections = userId => Collection.findAll({where: {userId}})
+
+
+
+/**
+ * @returns all language rows
+ */
+const getAllLanguages = () => Language.findAll();
 
 
 module.exports.db = {
@@ -307,4 +357,5 @@ module.exports.db = {
   selectWord,
   createCollection,
   getAllCollections,
+  getAllLanguages,
 };

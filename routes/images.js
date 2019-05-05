@@ -10,20 +10,6 @@ const app = new Clarifai.App({ apiKey: process.env.CLARIFAI_KEY });
 const { db } = require('../database/models');
 //Get array of probable object names for image
 
-// const googleTranslate = (word, from, to) => {
-//   const translatePromise = new Promise((res, rej) => {
-//     axios.get(`https://www.googleapis.com/language/translate/v2?key=${process.env.GOOGLE_TRANS_API}&source=${from}&q=${word}&target=${to}`)
-//       .then((result) => {
-//         const translation = result.data.data.translations[0].translatedText
-//         res(translation)
-//       })
-//       .catch((err) => {
-//         rej(err)
-//       })
-//   })
-//   return Promise.resolve(translatePromise);
-// };
-
 
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
@@ -46,15 +32,15 @@ cloudinary.config({
 router.post('/', (req, res) => {
 
   let pic = req.body.base64
-  let {nativeLanguage, url} = req.body
-  // let nativeLanguage  = 'es'
-  // let url;
-  // cloudinary.uploader.upload(`data:image/png;base64,${pic}`, function (error, result) {
-  //   if (error) {
-  //     console.log(error)
-  //   }
-  //   else {
-  //     url = result.secure_url
+  let {nativeLanguage} = req.body
+  let nativeLanguage  = 'es'
+  let url;
+  cloudinary.uploader.upload(`data:image/png;base64,${pic}`, function (error, result) {
+    if (error) {
+      console.log(error)
+    }
+    else {
+      url = result.secure_url
       app.models.predict(Clarifai.GENERAL_MODEL, url)
         .then(({ outputs }) => {
           // gets the array of images from the clarifai object
@@ -118,10 +104,8 @@ router.post('/', (req, res) => {
         }).catch((err) => {
           console.log(err);
         });
-  //   }
-  // });
-//////////////////////////////////////////////////////////////////////////
-
+    }
+  });
 });
 
 
