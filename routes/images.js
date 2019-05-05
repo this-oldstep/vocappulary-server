@@ -33,7 +33,6 @@ router.post('/', (req, res) => {
 
   let pic = req.body.base64
   let {nativeLanguage} = req.body
-  let nativeLanguage  = 'es'
   let url;
   cloudinary.uploader.upload(`data:image/png;base64,${pic}`, function (error, result) {
     if (error) {
