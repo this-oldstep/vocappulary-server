@@ -183,7 +183,7 @@ Collection.hasMany(CollectionItem);
 
 
 sequelize
-  .sync({force: true})
+  .sync(/* {force: true} */)
   .then(result => {
     console.log('succesfully connected to database', result);
     // adds languages if they do not exist

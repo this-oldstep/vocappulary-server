@@ -225,6 +225,8 @@ const addTranslationToWord = (wordId, language, translation) => {
     })
 };
 
+
+
 const makeNewCollectionItem = (collectionId, image_url, wordId) => {
   const collectionItemObj = {};
   return Collection.findOne({id: collectionId})
@@ -232,9 +234,9 @@ const makeNewCollectionItem = (collectionId, image_url, wordId) => {
       collectionItemObj.collectionCol = collectionCol;
       return collectionCol.getUser()
     })
-    .then(userCol => 
-      userCol.getCurrentLanguage()
-    )
+    .then(userCol => {
+      return userCol.getCurrent_language()
+    })
     .then(currentLanguageRow => {
       collectionItemObj.currentLanguageRow = currentLanguageRow;
       return Language.findOne({

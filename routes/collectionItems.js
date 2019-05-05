@@ -19,7 +19,7 @@ router.post('/', (req,res) => {
   const { collectionId, imgUrl, wordId } = req.body;
   db.makeNewCollectionItem(collectionId, imgUrl, wordId)
     .then(item => {
-      res.statusCode(200);
+      res.status(200).json(item);
     })
     .catch(err => {
       console.error(err);
