@@ -8,6 +8,8 @@ const {
   Translation,
 } = require("./config");
 
+const { googleTranslate } = require('../apiHelpers');
+
 
 
 /**
@@ -224,20 +226,62 @@ const addTranslationToWord = (wordId, language, translation) => {
 };
 
 const makeNewCollectionItem = (collectionId, image_url, wordId) => {
-  return CollectionItem.findOrCreate({
-    where: {
-      collectionId,
-      wordId,
-    },
-    defaults: {
-      collectionId,
-      image_url,
-      wordId,
-    },
-  });
+  const collectionItemObj = {};
+  return Collection.findOne({id: collectionId})
+    .then(collectionCol => {
+      collectionItemObj.collectionCol = collectionCol;
+      return collectionCol.getUser()
+    })
+    .then(userCol => 
+      userCol.getCurrentLanguage()
+    )
+    .then(currentLanguageRow => {
+      collectionItemObj.currentLanguageRow = currentLanguageRow;
+      return Language.findOne({
+        where: {
+          name: "english",
+        }
+      })
+    })
+    .then(englishRow => {
+      collectionItemObj.englishRow = englishRow
+      return Translation.findOne({
+        where: {
+          wordId,
+          languageId: englishRow.id
+        }
+      })
+    })
+    .then(engTranslation => {
+      return googleTranslate(engTranslation.text, collectionItemObj.englishRow.lang_code, collectionItemObj.currentLanguageRow.lang_code)
+    })
+    .then(translatedText => {
+      return Translation.create({
+        text: translatedText,
+        wordId,
+        languageId: collectionItemObj.currentLanguageRow.id,
+      })
+    })
+    .then(translatedRow => {
+      collectionItemObj.translatedRow = translatedRow;
+      return CollectionItem.create({
+        image_url,
+        wordId,
+        collectionId,
+      })
+    })
+    .then(collectionItemRow => {
+      return {
+        image_url,
+        currentLangText: collectionItemObj.translatedRow.text,
+      }
+    })
+    .catch(err => {
+      console.error(err);
+    })
 };
 
-makeNewCollectionItem(1, "lmao.com", 4)
+// makeNewCollectionItem(1, "lmao.com", 4)
 
 
 

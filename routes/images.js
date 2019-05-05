@@ -2,26 +2,27 @@ const express = require('express');
 const router = express.Router();
 const Clarifai = require('clarifai');
 var cloudinary = require('cloudinary').v2;
-const axios = require('axios');
+// const axios = require('axios');
+const { googleTranslate } = require('../apiHelpers');
 
 const app = new Clarifai.App({ apiKey: process.env.CLARIFAI_KEY });
 
 const { db } = require('../database/models');
 //Get array of probable object names for image
 
-const googleTranslate = (word, from, to) => {
-  const translatePromise = new Promise((res, rej) => {
-    axios.get(`https://www.googleapis.com/language/translate/v2?key=${process.env.GOOGLE_TRANS_API}&source=${from}&q=${word}&target=${to}`)
-      .then((result) => {
-        const translation = result.data.data.translations[0].translatedText
-        res(translation)
-      })
-      .catch((err) => {
-        rej(err)
-      })
-  })
-  return Promise.resolve(translatePromise);
-};
+// const googleTranslate = (word, from, to) => {
+//   const translatePromise = new Promise((res, rej) => {
+//     axios.get(`https://www.googleapis.com/language/translate/v2?key=${process.env.GOOGLE_TRANS_API}&source=${from}&q=${word}&target=${to}`)
+//       .then((result) => {
+//         const translation = result.data.data.translations[0].translatedText
+//         res(translation)
+//       })
+//       .catch((err) => {
+//         rej(err)
+//       })
+//   })
+//   return Promise.resolve(translatePromise);
+// };
 
 
 cloudinary.config({
