@@ -183,7 +183,7 @@ Collection.hasOne(CollectionItem);
 
 
 sequelize
-  .sync({force: true})
+  .sync({})
   .then(result => {
     console.log('succesfully connected to database', result);
     // adds languages if they do not exist
