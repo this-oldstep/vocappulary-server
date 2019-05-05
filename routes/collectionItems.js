@@ -11,11 +11,19 @@ router.get('/', (req,res)=>{
     })
     .catch(err => {
       console.error(err);
-    })
+      res.sendStatus(404)
+    });
 })
 
 router.post('/', (req,res) => {
-  
+  const { collectionId, imgUrl, wordId } = req.body;
+  db.makeNewCollectionItem(collectionId, imgUrl, wordId)
+    .then(item => {
+      res.statusCode(200);
+    })
+    .catch(err => {
+      console.error(err);
+    });
 })
 
 module.exports = router;

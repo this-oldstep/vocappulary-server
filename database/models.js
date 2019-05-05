@@ -237,7 +237,7 @@ const makeNewCollectionItem = (collectionId, image_url, wordId) => {
   });
 };
 
-
+makeNewCollectionItem(1, "lmao.com", 4)
 
 
 
@@ -245,5 +245,7 @@ module.exports.db = {
   checkWords,
   getTranslation,
   addTranslationToWord,
+  getAllCollectionItems,
+  makeNewCollectionItem,
   selectWord
 };

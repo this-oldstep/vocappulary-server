@@ -106,10 +106,6 @@ router.post('/', (req, res) => {
                           languageId: langRow.id,
                           text: langRow.text
                         };
-                        dataObj.wordId = langRow.wordId;
-                        dataObj.translationId = langRow.id;
-                        dataObj.languageId = langRow.id;
-                        return dataObj
                       })
                       res.send({ 
                         data: allData,
