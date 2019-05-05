@@ -18,6 +18,7 @@ const textToSpeech = require('./routes/text-to-speech.js');
 const collections = require('./routes/collections');
 const collectionItems = require('./routes/collectionItems');
 const auth = require('./routes/auth');
+const user = require('./routes/user');
 
 ///////////////
 
@@ -26,7 +27,7 @@ app.use('/texttospeech', textToSpeech);
 app.use('/collections', collections);
 app.use('/collectionItems', collectionItems);
 app.use('/auth', auth);
-
+app.use('/user', user);
 
 ///////////////
 
