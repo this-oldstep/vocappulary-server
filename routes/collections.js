@@ -24,7 +24,7 @@ router.post('/', (req, res) => {
  * takes userId
  * gets all collections related to a user
  */
-router.get('/', (req, res)=>{
+router.post('/get', (req, res)=>{
   
   let { userId } = req.body
   
