@@ -135,6 +135,10 @@ const getAllCollectionItems = (collectionId) => {
     })
     .then(user => {
       collectionObject.user = user;
+      return Language.findOne({where: {name: "english"}});
+    })
+    .then((englishRow) => {
+      collectionObject.englishRow = englishRow;
       return collectionObject.collectionCol.getCollection_items();
     })
     .then(collectionItems => {
@@ -150,8 +154,34 @@ const getAllCollectionItems = (collectionId) => {
                 }
               })
             )
-            .then(transations => {
-              res(transations)
+            .then(transation => {
+              if(transation) {
+                res(transation)
+              } else {
+                Translation.findOne({
+                  where: {
+                    wordId: item.wordId,
+                    languageId: collectionObject.englishRow.id,
+                  }
+                })
+                .then(englishTranslationRow => {
+                  return Language.findOne({
+                    where: {
+                      id: collectionObject.user.nativeLanguageId,
+                    }
+                  })
+                  .then(nativeLanguageRow => {
+                    return googleTranslate(englishTranslationRow.text, "en", nativeLanguageRow.lang_code);
+                  })
+                })
+                .then(nativeLanguageText => {
+                  return Translation.create({
+                    text: nativeLanguageText,
+                    wordId: item.wordId,
+                    languageId: collectionObject.user.nativeLanguageId,
+                  })
+                })
+              }
             })
         })
       )
@@ -170,8 +200,34 @@ const getAllCollectionItems = (collectionId) => {
                 }
               })
             )
-            .then(transations => {
-              res(transations);
+            .then(transation => {
+              if(transation) {
+                res(transation)
+              } else {
+                Translation.findOne({
+                  where: {
+                    wordId: item.wordId,
+                    languageId: collectionObject.englishRow.id,
+                  }
+                })
+                .then(englishTranslationRow => {
+                  return Language.findOne({
+                    where: {
+                      id: collectionObject.user.currentLanguageId,
+                    }
+                  })
+                  .then(currentLanguageRow => {
+                    return googleTranslate(englishTranslationRow.text, "en", currentLanguageRow.lang_code);
+                  })
+                })
+                .then(nativeLanguageText => {
+                  return Translation.create({
+                    text: nativeLanguageText,
+                    wordId: item.wordId,
+                    languageId: collectionObject.user.nativeLanguageId,
+                  })
+                })
+              }
             })
         })
       )
