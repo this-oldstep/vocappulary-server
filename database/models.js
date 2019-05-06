@@ -426,8 +426,10 @@ const getAllCollections = userId =>
 const getAllLanguages = () => Language.findAll();
 
 
+
 const makeUser = (username, email, currentLanguageId, nativeLanguageId, points) => 
   User.create({username, email, currentLanguageId, nativeLanguageId, points})
+
 
 
 const findUser = (email) => 
