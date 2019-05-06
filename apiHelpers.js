@@ -7,6 +7,17 @@ const path = require('path');
 const client = new textToSpeech.TextToSpeechClient();
 
 
+//Configuring AWS environment
+
+
+AWS.config.update({
+  accessKeyId: process.env.AWS_ACCESS_KEY,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+});
+
+var S3 = new AWS.S3();
+
+
 /**
  * 
  * @param {string} word - word to be translated
@@ -29,10 +40,6 @@ const googleTranslate = (word, from, to) => {
 };
 
 
-const googleTextToSpeech = () => {
-  
-}
-
 
 const googleTextToSpeech = (word) => {
 
@@ -44,32 +51,42 @@ const googleTextToSpeech = (word) => {
     };
   
     // Performs the Text-to-Speech request
-    const [response] = await client.synthesizeSpeech(request);
+    // const [response] = await client.synthesizeSpeech(request);
+    Promise.resolve(new Promise((res, rej) => {
+      res(client.synthesizeSpeech(request))
+    }))
+    .then(([response]) => {
+      const writeFile = util.promisify(fs.writeFile);
+      // await writeFile(`${word}.mp3`, response.audioContent, 'binary');
+      Promise.resolve(new Promise((res, rej) => {
+        res(writeFile(`${word}.mp3`, response.audioContent, 'binary'))
+      }))
+      .then(() => {
+        console.log(`Audio content written to file: ${word}.mp3`);
+      
+        const filePath = `./${word}.mp3`;
+      
+        const params = {
+          Bucket: 'vocapp-bucket',
+          Body: fs.createReadStream(filePath),
+          Key: "words/" + path.basename(filePath),
+          ACL: 'public-read'
+        };
+      
+        S3.upload(params, function (err, data) {
+          if (err) {
+            console.log("Error", err);
+            rej(err);
+          }
+          if (data) {
+            fs.unlinkSync(`${word}.mp3`);
+            console.log("Uploaded in:", data.Location);
+            res('uploaded at: ' + data.Location);
+          }
+      })
+      });
+    })
     // Write the binary audio content to a local file
-    const writeFile = util.promisify(fs.writeFile);
-    await writeFile(`${word}.mp3`, response.audioContent, 'binary');
-    console.log(`Audio content written to file: ${word}.mp3`);
-  
-    const filePath = `./${word}.mp3`;
-  
-    const params = {
-      Bucket: 'vocapp-bucket',
-      Body: fs.createReadStream(filePath),
-      Key: "words/" + path.basename(filePath),
-      ACL: 'public-read'
-    };
-  
-    S3.upload(params, function (err, data) {
-      if (err) {
-        console.log("Error", err);
-        res.send(err);
-      }
-      if (data) {
-        fs.unlinkSync(`${word}.mp3`);
-        console.log("Uploaded in:", data.Location);
-        res.send('uploaded at: ' + data.Location);
-      }
-    });
   })
   
   return Promise.resolve(mp3Promise)
