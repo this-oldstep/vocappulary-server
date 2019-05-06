@@ -248,6 +248,7 @@ const makeNewCollectionItem = (collectionId, image_url, wordId) => {
       return collectionCol.getUser()
     })
     .then(userCol => {
+      collectionItemObj.userCol = userCol;
       return userCol.getCurrent_language()
     })
     .then(currentLanguageRow => {
@@ -298,6 +299,18 @@ const makeNewCollectionItem = (collectionId, image_url, wordId) => {
       })
     })
     .then(collectionItemRow => {
+      collectionItemObj.collectionItemRow = collectionItemRow
+      return collectionItemObj.userCol.getNative_language()
+    })
+    .then(nativeLanguageRow => {
+      return Translation.findOne({
+        where: {
+          wordId,
+          languageId: nativeLanguageRow.id,
+        }
+      })
+    })
+    .then(nativeTranslationRow => {
       collectionItemObj.collectionCol.update({
         count: collectionItemObj.collectionCol.count + 1,
       }, {
@@ -305,7 +318,9 @@ const makeNewCollectionItem = (collectionId, image_url, wordId) => {
       })
       return {
         image_url,
-        currentLangText: collectionItemObj.translatedRow.text,
+        currentTranslation: collectionItemObj.translatedRow.text,
+        nativeTranslation: nativeTranslationRow.text,
+        itemId: collectionItemObj.collectionItemRow.id,
       }
     })
     .catch(err => {
