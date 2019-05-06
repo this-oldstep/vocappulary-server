@@ -5,7 +5,7 @@ const router = express.Router();
 const { db } = require('../database/models');
 
 admin.initializeApp({
-  credential: admin.credential.cert(process.env.GOOGLE_APPLICATION_CREDENTIALS),
+  credential: admin.credential.cert(process.env.FIREBASE),
   databaseURL: 'https://vocappulary-239516.firebaseio.com',
 });
 
