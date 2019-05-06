@@ -33,7 +33,7 @@ const User = sequelize.define('user', {
   },
   points: {
     type: Sequelize.INTEGER
-  }
+  },
 });
 
 //Collection Model ///
@@ -185,7 +185,7 @@ Collection.hasMany(CollectionItem);
 sequelize
   .sync(/* {force: true} */)
   .then(result => {
-    console.log('succesfully connected to database', result);
+    console.log('succesfully connected to database');
     // adds languages if they do not exist
     const languages = [
       {

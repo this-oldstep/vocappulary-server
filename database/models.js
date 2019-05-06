@@ -242,7 +242,7 @@ const addTranslationToWord = (wordId, language, translation) => {
  */
 const makeNewCollectionItem = (collectionId, image_url, wordId) => {
   const collectionItemObj = {};
-  return Collection.findOne({id: collectionId})
+  return Collection.findOne({where: {id: collectionId}})
     .then(collectionCol => {
       collectionItemObj.collectionCol = collectionCol;
       return collectionCol.getUser()
@@ -349,12 +349,12 @@ const getAllCollections = userId =>
 const getAllLanguages = () => Language.findAll();
 
 
-const makeUser = (username, email, currentLanguageId, nativeLanguageId) => 
-  User.create({username, email, currentLanguageId, nativeLanguageId})
+const makeUser = (username, email, currentLanguageId, nativeLanguageId, points) => 
+  User.create({username, email, currentLanguageId, nativeLanguageId, points})
 
 
-const findUser = (username) => 
-  User.findOne({where: {username}})
+const findUser = (email) => 
+  User.findOne({where: {email}})
 
 
 
