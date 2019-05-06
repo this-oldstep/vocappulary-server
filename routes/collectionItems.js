@@ -26,7 +26,9 @@ router.get('/:id', (req,res)=>{
  * creates a new collection item, and adds a translation of the word if nessisary
  */
 router.post('/', (req,res) => {
+
   const { collectionId, imgUrl, wordId } = req.body;
+  
   db.makeNewCollectionItem(collectionId, imgUrl, wordId)
     .then(item => {
       res.status(200).json(item);
