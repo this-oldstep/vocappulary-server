@@ -8,8 +8,10 @@ const { db } = require('../database/models.js');
  * takes collectionId
  * gets an array of all the collection items of a collection with their native transltion, current translation, collectionItemId, and image url
  */
-router.get('/', (req,res)=>{
-  db.getAllCollectionItems(req.body.collectionId)
+router.get('/:id', (req,res)=>{
+
+
+  db.getAllCollectionItems(req.params.id)
     .then(collection => {
       res.json(collection)
     })
@@ -30,6 +32,7 @@ router.post('/', (req,res) => {
       res.status(200).json(item);
     })
     .catch(err => {
+      res.status(400).send('There was an error making new item')
       console.error(err);
     });
 })
