@@ -181,6 +181,9 @@ const getAllCollectionItems = (collectionId) => {
                     languageId: collectionObject.user.nativeLanguageId,
                   })
                 })
+                .then(nativeTranslation => {
+                  res(nativeTranslation)
+                })
               }
             })
         })
@@ -220,12 +223,15 @@ const getAllCollectionItems = (collectionId) => {
                     return googleTranslate(englishTranslationRow.text, "en", currentLanguageRow.lang_code);
                   })
                 })
-                .then(nativeLanguageText => {
+                .then(currentLanguageText => {
                   return Translation.create({
-                    text: nativeLanguageText,
+                    text: currentLanguageText,
                     wordId: item.wordId,
                     languageId: collectionObject.user.nativeLanguageId,
                   })
+                })
+                .then(currentTranslation => {
+                  res(currentTranslation)
                 })
               }
             })
@@ -420,8 +426,10 @@ const getAllCollections = userId =>
 const getAllLanguages = () => Language.findAll();
 
 
+
 const makeUser = (username, email, currentLanguageId, nativeLanguageId, points) => 
   User.create({username, email, currentLanguageId, nativeLanguageId, points})
+
 
 
 const findUser = (email) => 
