@@ -99,25 +99,35 @@ describe('CREATES USER', () => {
     })
   });
 
-  test('successfully adds a collection', () => {
-    return db.createCollection(userId,'jesttest')
-      .then((result) => {
-        expect(result.id).toBe('hello');
-        return result;
-      })
-      .then((collection)=>{
-        db.deleteCollection('jesttestcollect', userId)
-        
-      })
-      .then((deletedCollection)=>{
-        expect
-      })
-      .catch((err) => {
-        console.log(err)
-      })
-  });
+  // test('successfully adds a collection', () => {
+  //   return db.createCollection(userId,'jesttest')
+  //     .then((result) => {
+  //       expect(result.id).toBe('hello');
+  //       return db.deleteCollection('jesttestcollect', userId)
+  //         .then((result)=>{
+  //           console.log(result)
+  //         })
+  //     })
+  //     .catch((err) => {
+  //       console.log(err)
+  //     })
+  // });
 
   afterAll(() => {
     return db.deleteUser('jesttest', 'jesttest@jesttest.com')
   })
 })
+
+
+// describe('CREATES USER', () => {
+//   beforeAll(() => {
+//     return db.makeUser('jesttest', 'jesttest@jesttest.com', 1, 2, 0)
+//       .then((created) => {
+//         userId = created.id
+//         console.log(created);
+//       })
+//       .catch((err) => {
+//         console.log(err);
+//       })
+//   })
+// })
