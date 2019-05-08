@@ -48,7 +48,7 @@ const Collection = sequelize.define('collection', {
   name: {
     type: Sequelize.STRING
   },
-  public: {
+  is_public: {
     type: Sequelize.BOOLEAN
   },
   count: {
