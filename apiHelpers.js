@@ -41,12 +41,12 @@ const googleTranslate = (word, from, to) => {
 
 
 
-const googleTextToSpeech = (word) => {
+const googleTextToSpeech = (word, languageCode = 'en') => {
 
   const mp3Promise = new Promise((res, rej) => {
     const request = {
       input: { text: word },
-      voice: { languageCode: 'en-US', ssmlGender: 'NEUTRAL' },
+      voice: { languageCode, ssmlGender: 'NEUTRAL' },
       audioConfig: { audioEncoding: 'MP3' },
     };
   
@@ -59,7 +59,13 @@ const googleTextToSpeech = (word) => {
       const writeFile = util.promisify(fs.writeFile);
       // await writeFile(`${word}.mp3`, response.audioContent, 'binary');
       Promise.resolve(new Promise((res, rej) => {
-        res(writeFile(`${word}.mp3`, response.audioContent, 'binary'))
+        writeFile(`${word}.mp3`, response.audioContent, 'binary')
+          .then(value => {
+            res(value)
+          })
+          .catch(err => {
+            rej(err)
+          })
       }))
       .then(() => {
         console.log(`Audio content written to file: ${word}.mp3`);
@@ -81,9 +87,9 @@ const googleTextToSpeech = (word) => {
           if (data) {
             fs.unlinkSync(`${word}.mp3`);
             console.log("Uploaded in:", data.Location);
-            res('uploaded at: ' + data.Location);
+            res(data.Location);
           }
-      })
+        })
       });
     })
     // Write the binary audio content to a local file
