@@ -97,7 +97,7 @@ const findOrCreateTranslations = (collectionItemId, getAudio = false) => {
           } else {
             Translation.findOne({
               where: {
-                wordId: collectionItem.wordId,
+                wordId: collectionItemRow.wordId,
                 languageId: englishLanguageRow.id,
               }
             })
@@ -138,7 +138,7 @@ const findOrCreateTranslations = (collectionItemId, getAudio = false) => {
             } else {
               Translation.findOne({
                 where: {
-                  wordId: collectionItem.wordId,
+                  wordId: collectionItemRow.wordId,
                   languageId: englishLanguageRow.id,
                 }
               })
