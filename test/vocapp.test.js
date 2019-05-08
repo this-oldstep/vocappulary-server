@@ -35,7 +35,7 @@ describe('TRANSLATION API TESTS', () => {
   });
 })
 
-describe('DATABASE GET DB HELPER TESTS', () => {
+describe('DATABASE GET DB HELPER TESTS. IF DB IS CLEARED IGNORE', () => {
 
   test('Gets correct collections ', () => {
     return db.getAllCollections(14)
@@ -90,19 +90,19 @@ describe('CREATES USER', () => {
       });
   });
 
-  // test('successfully adds a collection', () => {
-  //   return db.createCollection(userId,'jesttest')
-  //     .then((result) => {
-  //       expect(result.id).toBe('hello');
-  //       return db.deleteCollection('jesttestcollect', userId)
-  //         .then((result)=>{
-  //           console.log(result)
-  //         })
-  //     })
-  //     .catch((err) => {
-  //       console.log(err)
-  //     })
-  // });
+  test('successfully adds a collection', () => {
+    return db.createCollection(userId,'jesttest')
+      .then((result) => {
+        expect(result.id).toBe('hello');
+        return db.deleteCollection('jesttestcollect', userId)
+          .then((result)=>{
+            console.log(result)
+          })
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+  });
 
   afterAll(() => {
     return db.deleteUser('jesttest', 'jesttest@jesttest.com')
@@ -112,16 +112,47 @@ describe('CREATES USER', () => {
   });
 });
 
+describe('CREATES COLLECTION', () => {
+  let userId;
+  let collectionId;
+  beforeAll(() => {
+    return db.makeUser('jesttest', 'jesttest@jesttest.com', 1, 2, 0)
+      .then((created) => {
+        userId = created.id;
+        console.log(created);
+        return userId;
+      })
+      .then(()=>{
+        return db.createCollection(userId, 'jesttest')
+          .then((collection) => {
+            collectionId = collection.id
+          })
+      })
+      
+  }); 
+  
+  test('Added both a user and collection, and collection exists in db', () => {
+    return db.getAllCollections(userId)
+      .then((items) => {
+        expect(items.name).toBe('jesttest')
+      });
+  });
 
-// describe('CREATES USER', () => {
-//   beforeAll(() => {
-//     return db.makeUser('jesttest', 'jesttest@jesttest.com', 1, 2, 0)
-//       .then((created) => {
-//         userId = created.id
-//         console.log(created);
-//       })
-//       .catch((err) => {
-//         console.log(err);
-//       })
-//   })
-// })
+
+  afterAll(() => {
+
+    return db.deleteCollection('jesttest', userId)
+      .then((result) => {
+        console.log(result)
+        return result;
+      })
+      .then(() =>{
+        return db.deleteUser('jesttest', 'jesttest@jesttest.com')
+          .then((user) => {
+            console.log(user);
+          });
+      })
+
+  });
+
+})
