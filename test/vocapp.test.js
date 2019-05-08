@@ -115,39 +115,37 @@ describe('CREATES USER', () => {
 describe('CREATES COLLECTION', () => {
   let userId;
   let collectionId;
-  beforeAll(() => {
+  // beforeAll(() => {
+    
+  // }); 
+  
+  test('Added both a user and collection, and collection exists in db', () => {
     return db.makeUser('jesttest', 'jesttest@jesttest.com', 1, 2, 0)
       .then((created) => {
         userId = created.id;
-        console.log(created);
-        return userId;
       })
       .then(()=>{
         return db.createCollection(userId, 'jesttest')
-          .then((collection) => {
-            collectionId = collection.id
-          })
       })
-      
-  }); 
-  
-  test('Added both a user and collection, and collection exists in db', () => {
-    return db.getAllCollections(userId)
+      .then((collection) => {
+        collectionId = collection.id
+        return db.getAllCollections(userId)
+      })
       .then((items) => {
-        expect(items.name).toBe('jesttest')
+        expect(items[0].name).toBe('jesttest')
       });
   });
 
 
   afterAll(() => {
 
-    return db.deleteCollection('jesttest', userId)
+    db.deleteCollection('jesttest', userId)
       .then((result) => {
         console.log(result)
         return result;
       })
       .then(() =>{
-        return db.deleteUser('jesttest', 'jesttest@jesttest.com')
+        db.deleteUser('jesttest', 'jesttest@jesttest.com')
           .then((user) => {
             console.log(user);
           });
