@@ -643,7 +643,7 @@ const makeNewCollectionItem = (collectionId, image_url, wordId) => {
 const createCollection = (userId, name, isPublic = false) => {
   return Collection.create({
     name,
-    public: isPublic,
+    is_public: isPublic,
     count: 0,
     userId,
   })
