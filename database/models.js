@@ -649,6 +649,15 @@ const createCollection = (userId, name, isPublic = false) => {
   })
 }
 
+const deleteCollection = (name, userId)=>{
+  return Collection.destroy({
+    where:{
+      name: name,
+      userId: userId
+    }
+  })
+}
+
 
 
 /**
@@ -671,11 +680,19 @@ const getAllLanguages = () => Language.findAll();
 const makeUser = (username, email, currentLanguageId, nativeLanguageId, points) => 
   User.create({username, email, currentLanguageId, nativeLanguageId, points})
 
+//made this for jest testing
+const deleteUser = (username, email)=>{
+    User.destroy({
+      where:{
+        username: username,
+        email: email,
+      }
+    })
+  }
 
 
 const findUser = (email) => 
   User.findOne({where: {email}})
-
 
 
 module.exports.db = {
@@ -690,5 +707,7 @@ module.exports.db = {
   getAllLanguages,
   makeUser,
   findUser,
+  deleteUser,
+  deleteCollection,
   findOrCreateTranslations,
 };

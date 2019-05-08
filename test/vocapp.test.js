@@ -1,16 +1,5 @@
-const Sequelize = require('sequelize');
 const { googleTranslate } = require('../apiHelpers.js');
 const { db } = require('../database/models.js');
-const {getAllCollections} = require('./util.js');
-
-
-const sequelize = new Sequelize('vocapp', process.env.DB_USER, process.env.DB_PASSWORD, {
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
-  dialect: 'postgres',
-});
-sequelize.sync();
-
 
 describe('TRANSLATION API TESTS', () => {
   test('english to spanish translation', () => {
@@ -35,7 +24,7 @@ describe('TRANSLATION API TESTS', () => {
   });
 })
 
-describe('DATABASE GET DB HELPER TESTS. IF DB IS CLEARED IGNORE', () => {
+xdescribe('DATABASE GET DB HELPER TESTS. IF DB IS CLEARED IGNORE', () => {
 
   test('Gets correct collections ', () => {
     return db.getAllCollections(14)
@@ -51,6 +40,7 @@ describe('DATABASE GET DB HELPER TESTS. IF DB IS CLEARED IGNORE', () => {
     return db.getAllLanguages()
       .then((languages) => {
         expect(languages.length).toBe(13);
+        return null
       })
   });
   
@@ -58,6 +48,7 @@ describe('DATABASE GET DB HELPER TESTS. IF DB IS CLEARED IGNORE', () => {
     return db.findUser('pr@pr.com')
       .then((user) => {
         expect(user.id).toBe(14);
+        return null
       })
   });
   
@@ -79,80 +70,81 @@ describe('CREATES USER', () => {
     return db.makeUser('jesttest', 'jesttest@jesttest.com', 1, 2, 0)
       .then((created) => {
         userId = created.id;
-        console.log(created);
+        return null;
       });
   });
 
   test('Succesfully Adds User, and then finds him in db', () => {
     return db.findUser('jesttest@jesttest.com')
       .then((result) => {
-        expect(result).not.toBeUndefined();
+        expect(result.id).toBe(userId);
       });
-  });
-
-  test('successfully adds a collection', () => {
-    return db.createCollection(userId,'jesttest')
-      .then((result) => {
-        expect(result.id).toBe('hello');
-        return db.deleteCollection('jesttestcollect', userId)
-          .then((result)=>{
-            console.log(result)
-          })
-      })
-      .catch((err) => {
-        console.log(err)
-      })
   });
 
   afterAll(() => {
     return db.deleteUser('jesttest', 'jesttest@jesttest.com')
-      .then((user) => {
-        console.log(user);
-      });
   });
 });
 
 describe('CREATES COLLECTION', () => {
   let userId;
   let collectionId;
-  beforeAll(() => {
-    db.makeUser('jesttest', 'jesttest@jesttest.com', 1, 2, 0)
-      .then((created) => {
-        userId = created.id;
-        console.log(created);
-        return userId;
-      })
-      .then(()=>{
-        db.createCollection(userId, 'jesttest')
-          .then((collection) => {
-            collectionId = collection.id
-          })
-      })
-      
-  }); 
+  // beforeAll(() => {
+    
+  // }); 
   
   test('Added both a user and collection, and collection exists in db', () => {
-    return db.getAllCollections(userId)
+    return db.makeUser('jesttest', 'jesttest@jesttest.com', 1, 2, 0)
+      .then((created) => {
+        userId = created.id;
+        return db.createCollection(userId, 'jesttest')
+      })
+      .then((collection) => {
+        collectionId = collection.id
+        return db.getAllCollections(userId)
+      })
       .then((items) => {
-        expect(items.name).toBe('jesttest')
+        expect(items[0].name).toBe('jesttest')
+        return null;
       });
   });
 
 
   afterAll(() => {
 
-    return db.deleteCollection('jesttest', userId)
+    db.deleteCollection('jesttest', userId)
       .then((result) => {
-        console.log(result)
-        return result;
-      })
-      .then(() =>{
         return db.deleteUser('jesttest', 'jesttest@jesttest.com')
-          .then((user) => {
-            console.log(user);
-          });
       })
+      .then((result)=>{
+        return null
+      })
+
 
   });
 
 })
+
+
+// describe('CREATES USER', () => {
+// let userId;
+// let collectionId;
+//   beforeAll(() => {
+//     return db.makeUser('jesttest', 'jesttest@jesttest.com', 1, 2, 0)
+//       .then((created) => {
+//         userId = created.id;
+//       })
+//       .then(() => {
+//         return db.createCollection(userId, 'jesttest')
+//       })
+//       .then((collection)=>{
+//         collectionId = collection.id
+//       })
+//   });
+
+//   test('Added both a user and collection, and collection exists in db', () => {
+//     return db.makeNewCollectionItem(collectionId, 'https://marmelab.com/images/blog/jest.png', )
+//   });
+
+
+// })
