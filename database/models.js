@@ -337,7 +337,7 @@ const getAllCollectionItems = (collectionId) => {
     .then(collectionItems => {
       return Promise.all(collectionItems.map(item => 
         new Promise((res, rej) => {
-          findOrCreateTranslations(item.id, false)
+          findOrCreateTranslations(item.id, true)
           .then(returnItem => {
             res(returnItem);
           })
