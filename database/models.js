@@ -643,10 +643,41 @@ const makeNewCollectionItem = (collectionId, image_url, wordId) => {
 const createCollection = (userId, name, isPublic = false) => {
   return Collection.create({
     name,
-    public: isPublic,
+    is_public: isPublic,
     count: 0,
     userId,
   })
+}
+
+
+
+const getAllCollectionItemsForUser = (userId) => {
+  return Collection.findAll({
+    where: {
+      userId,
+    }
+  })
+    .then(collectionRows => {
+      const collectionItemPromises = collectionRows.map(collectionRow => 
+        new Promise((res, rej) => {
+          collectionRow.getCollection_items()
+            .then(collectionItemRows => {
+              res(collectionItemRows);
+            })
+            .catch(err => {
+              rej(err);
+            })
+        })
+      )
+
+      return Promise.all(collectionItemPromises)
+    })
+    .then(unflattenedUserCollectionItems => {
+      const userCollectionItems = unflattenedUserCollectionItems.reduce((seed, array) => {
+        return seed.concat(array);
+      }, []);
+      return userCollectionItems;
+    })
 }
 
 
@@ -691,4 +722,5 @@ module.exports.db = {
   makeUser,
   findUser,
   findOrCreateTranslations,
+  getAllCollectionItemsForUser,
 };
