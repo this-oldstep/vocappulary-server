@@ -41,11 +41,11 @@ router.get('/:id/items', (req, res) => {
 
 })
 
-router.patch('/:id/:currentLanguage/:nativeLanguage/:email/edit/', (req, res) => {
+router.patch('/edit/', (req, res) => {
 
-  const { id, currentLanguage, nativeLanguage, email } = req.params
+  const { id, currentLanguageId, nativeLanguageId, email } = req.body
 
-  db.editUser(id, currentLanguage, nativeLanguage, email)
+  db.editUser(id, currentLanguageId, nativeLanguageId, email)
     .then(userRow => {
       res.status(200).json(userRow);
     })

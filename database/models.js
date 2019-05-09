@@ -515,16 +515,16 @@ const findUser = (email) =>
   User.findOne({where: {email}})
 
 
-const editUser = (userId, currentLanguage, nativeLanguage, email) => {
+const editUser = (userId, currentLanguageId, nativeLanguageId, email) => {
   const fields = [];
   const updateObj = {};
-  if(currentLanguage) {
-    fields.push("currentLanguage")
-    updateObj.currentLanguage = currentLanguage;
+  if(currentLanguageId) {
+    fields.push("currentLanguageId")
+    updateObj.currentLanguageId = currentLanguageId;
   }
-  if(nativeLanguage) {
-    fields.push("nativeLanguage")
-    updateObj.nativeLanguage = nativeLanguage;
+  if(nativeLanguageId) {
+    fields.push("nativeLanguageId")
+    updateObj.nativeLanguageId = nativeLanguageId;
   }
   if(email) {
     fields.push("email")
