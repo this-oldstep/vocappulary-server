@@ -660,6 +660,37 @@ const deleteCollection = (name, userId)=>{
 
 
 
+const getAllCollectionItemsForUser = (userId) => {
+  return Collection.findAll({
+    where: {
+      userId,
+    }
+  })
+    .then(collectionRows => {
+      const collectionItemPromises = collectionRows.map(collectionRow => 
+        new Promise((res, rej) => {
+          collectionRow.getCollection_items()
+            .then(collectionItemRows => {
+              res(collectionItemRows);
+            })
+            .catch(err => {
+              rej(err);
+            })
+        })
+      )
+
+      return Promise.all(collectionItemPromises)
+    })
+    .then(unflattenedUserCollectionItems => {
+      const userCollectionItems = unflattenedUserCollectionItems.reduce((seed, array) => {
+        return seed.concat(array);
+      }, []);
+      return userCollectionItems;
+    })
+}
+
+
+
 /**
  * gets all collections by userId
  * @param {number} userId
@@ -710,4 +741,5 @@ module.exports.db = {
   deleteUser,
   deleteCollection,
   findOrCreateTranslations,
+  getAllCollectionItemsForUser,
 };
