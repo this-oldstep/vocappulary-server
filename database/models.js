@@ -346,138 +346,6 @@ const getAllCollectionItems = (collectionId) => {
     })
 }
 
-// getAllCollectionItems(35)
-//   .then(ret => {
-//     return ret
-//   })
-//   .catch(err => {
-//     console.error(err)
-//   })
-
-// const getAllCollectionItems = (collectionId) => {
-//   const collectionObject = {}
-//   return Collection.findOne({where: {id: collectionId}})
-//     .then(collectionCol => {
-//       collectionObject.collectionCol = collectionCol;
-//       return collectionCol.getUser();
-//     })
-//     .then(user => {
-//       collectionObject.user = user;
-//       return Language.findOne({where: {name: "english"}});
-//     })
-//     .then((englishRow) => {
-//       collectionObject.englishRow = englishRow;
-//       return collectionObject.collectionCol.getCollection_items();
-//     })
-//     .then(collectionItems => {
-//       collectionObject.collectionItems = collectionItems;
-//       const translationPromises = collectionItems.map(item => 
-//         new Promise((res, rej) => {
-//           item.getWord()
-//             .then(word => 
-//               Translation.findOne({
-//                 where: {
-//                   wordId: word.id,
-//                   languageId: collectionObject.user.nativeLanguageId,
-//                 }
-//               })
-//             )
-//             .then(transation => {
-//               if(transation) {
-//                 res(transation)
-//               } else {
-//                 Translation.findOne({
-//                   where: {
-//                     wordId: item.wordId,
-//                     languageId: collectionObject.englishRow.id,
-//                   }
-//                 })
-//                 .then(englishTranslationRow => {
-//                   return Language.findOne({
-//                     where: {
-//                       id: collectionObject.user.nativeLanguageId,
-//                     }
-//                   })
-//                   .then(nativeLanguageRow => {
-//                     return googleTranslate(englishTranslationRow.text, "en", nativeLanguageRow.lang_code);
-//                   })
-//                 })
-//                 .then(nativeLanguageText => {
-//                   return Translation.create({
-//                     text: nativeLanguageText,
-//                     wordId: item.wordId,
-//                     languageId: collectionObject.user.nativeLanguageId,
-//                   })
-//                 })
-//                 .then(nativeTranslation => {
-//                   res(nativeTranslation)
-//                 })
-//               }
-//             })
-//         })
-//       )
-//       return Promise.all(translationPromises)
-//     })
-//     .then(nativeTranslations => {
-//       collectionObject.nativeTranslations = nativeTranslations;
-//       const getWordPromises = collectionObject.collectionItems.map(item =>
-//         new Promise((res, rej) => {
-//           item.getWord()
-//             .then(word => 
-//               Translation.findOne({
-//                 where: {
-//                   wordId: word.id,
-//                   languageId: collectionObject.user.currentLanguageId,
-//                 }
-//               })
-//             )
-//             .then(transation => {
-//               if(transation) {
-//                 res(transation)
-//               } else {
-//                 Translation.findOne({
-//                   where: {
-//                     wordId: item.wordId,
-//                     languageId: collectionObject.englishRow.id,
-//                   }
-//                 })
-//                 .then(englishTranslationRow => {
-//                   return Language.findOne({
-//                     where: {
-//                       id: collectionObject.user.currentLanguageId,
-//                     }
-//                   })
-//                   .then(currentLanguageRow => {
-//                     return googleTranslate(englishTranslationRow.text, "en", currentLanguageRow.lang_code);
-//                   })
-//                 })
-//                 .then(currentLanguageText => {
-//                   return Translation.create({
-//                     text: currentLanguageText,
-//                     wordId: item.wordId,
-//                     languageId: collectionObject.user.nativeLanguageId,
-//                   })
-//                 })
-//                 .then(currentTranslation => {
-//                   res(currentTranslation)
-//                 })
-//               }
-//             })
-//         })
-//       )
-//       return Promise.all(getWordPromises);
-//     })
-//     .then(currentTranslations => {
-//       collectionObject.currentTranslations = currentTranslations;
-//       return currentTranslations.map((currentTranslation, index) => ({
-//         itemId: collectionObject.collectionItems[index].id,
-//         url_image: collectionObject.collectionItems[index].image_url,
-//         currentTranslation: currentTranslation.text,
-//         nativeTranslation: collectionObject.nativeTranslations[index].text,
-//       }))
-//     })
-// }
-
 
 
 /**
@@ -540,96 +408,6 @@ const makeNewCollectionItem = (collectionId, image_url, wordId) => {
     return findOrCreateTranslations(collectionItemRow.id, true);
   })
 }
-
-
-
-// const makeNewCollectionItem = (collectionId, image_url, wordId) => {
-//   const collectionItemObj = {};
-//   return Collection.findOne({where: {id: collectionId}})
-//     .then(collectionCol => {
-//       collectionItemObj.collectionCol = collectionCol;
-//       return collectionCol.getUser()
-//     })
-//     .then(userCol => {
-//       collectionItemObj.userCol = userCol;
-//       return userCol.getCurrent_language()
-//     })
-//     .then(currentLanguageRow => {
-//       collectionItemObj.currentLanguageRow = currentLanguageRow;
-//       return Translation.findOne({
-//         where: {
-//           wordId,
-//           languageId: currentLanguageRow.id,
-//         }
-//       })
-//     })
-//     .then(translatedRow => {
-//       if(translatedRow) {
-//         return translatedRow
-//       } else {
-//         return Language.findOne({
-//           where: {
-//             name: "english",
-//           }
-//         })
-//         .then(englishRow => {
-//           collectionItemObj.englishRow = englishRow
-//           return Translation.findOne({
-//             where: {
-//               wordId,
-//               languageId: englishRow.id
-//             }
-//           })
-//         })
-//         .then(engTranslation => {
-//           return googleTranslate(engTranslation.text, collectionItemObj.englishRow.lang_code, collectionItemObj.currentLanguageRow.lang_code)
-//         })
-//         .then(translatedText => {
-//           return Translation.create({
-//             text: translatedText,
-//             wordId,
-//             languageId: collectionItemObj.currentLanguageRow.id,
-//           })
-//         })
-//       }
-//     })
-//     .then(translatedRow => {
-//       collectionItemObj.translatedRow = translatedRow;
-//       return CollectionItem.create({
-//         image_url,
-//         wordId,
-//         collectionId,
-//       })
-//     })
-//     .then(collectionItemRow => {
-//       collectionItemObj.collectionItemRow = collectionItemRow
-//       return collectionItemObj.userCol.getNative_language()
-//     })
-//     .then(nativeLanguageRow => {
-//       return Translation.findOne({
-//         where: {
-//           wordId,
-//           languageId: nativeLanguageRow.id,
-//         }
-//       })
-//     })
-//     .then(nativeTranslationRow => {
-//       collectionItemObj.collectionCol.update({
-//         count: collectionItemObj.collectionCol.count + 1,
-//       }, {
-//         fields: ['count'],
-//       })
-//       return {
-//         image_url,
-//         currentTranslation: collectionItemObj.translatedRow.text,
-//         nativeTranslation: nativeTranslationRow.text,
-//         itemId: collectionItemObj.collectionItemRow.id,
-//       }
-//     })
-//     .catch(err => {
-//       console.error(err);
-//     })
-// };
 
 
 
@@ -737,6 +515,32 @@ const findUser = (email) =>
   User.findOne({where: {email}})
 
 
+const editUser = (userId, currentLanguage, nativeLanguage, email) => {
+  const fields = [];
+  const updateObj = {};
+  if(currentLanguage) {
+    fields.push("currentLanguage")
+    updateObj.currentLanguage = currentLanguage;
+  }
+  if(nativeLanguage) {
+    fields.push("nativeLanguage")
+    updateObj.nativeLanguage = nativeLanguage;
+  }
+  if(email) {
+    fields.push("email")
+    updateObj.email = email;
+  }
+  return User.findOne({
+    where: {
+      id: userId,
+    }
+  })
+    .then(userRow => {
+      return userRow.update(updateObj, {fields});
+    })
+}
+
+
 module.exports.db = {
   checkWords,
   getTranslation,
@@ -753,4 +557,5 @@ module.exports.db = {
   deleteCollection,
   findOrCreateTranslations,
   getAllCollectionItemsForUser,
+  editUser
 };

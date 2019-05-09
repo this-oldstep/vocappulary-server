@@ -41,5 +41,19 @@ router.get('/:id/items', (req, res) => {
 
 })
 
+router.patch('/:id/:currentLanguage/:nativeLanguage/:email/edit/', (req, res) => {
+
+  const { id, currentLanguage, nativeLanguage, email } = req.params
+
+  db.editUser(id, currentLanguage, nativeLanguage, email)
+    .then(userRow => {
+      res.status(200).json(userRow);
+    })
+    .catch(err => {
+      console.error(err);
+      res.sendStatus(500);
+    })
+})
+
 
 module.exports = router;
