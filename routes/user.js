@@ -26,6 +26,20 @@ router.get('/', (req, res) => {
     })
 })
 
+router.get('/:id/items', (req, res) => {
+
+  const { id } = req.params;
+
+  db.getAllCollectionItemsForUser(id)
+    .then(collectionItems => {
+      res.json(collectionItems)
+    })
+    .catch(err => {
+      console.error(err);
+      res.sendStatus(500);
+    })
+
+})
 
 
 module.exports = router;
