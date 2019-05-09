@@ -669,6 +669,7 @@ const getAllCollectionItemsForUser = (userId) => {
     .then(collectionRows => {
       const collectionItemPromises = collectionRows.map(collectionRow => 
         new Promise((res, rej) => {
+          // findOrCreateTranslations(collectionRow.id)
           collectionRow.getCollection_items()
             .then(collectionItemRows => {
               res(collectionItemRows);
@@ -682,10 +683,20 @@ const getAllCollectionItemsForUser = (userId) => {
       return Promise.all(collectionItemPromises)
     })
     .then(unflattenedUserCollectionItems => {
-      const userCollectionItems = unflattenedUserCollectionItems.reduce((seed, array) => {
+      const userCollectionItemPromises = unflattenedUserCollectionItems.reduce((seed, array) => {
         return seed.concat(array);
-      }, []);
-      return userCollectionItems;
+      }, []).map(userCollectionItem => 
+        new Promise((res, rej) => {
+          findOrCreateTranslations(userCollectionItem.id)
+            .then(userCollectionItemRow => {
+              res(userCollectionItemRow);
+            })
+            .catch(err => {
+              rej(err);
+            })
+        })
+      )
+      return Promise.all(userCollectionItemPromises)
     })
 }
 
