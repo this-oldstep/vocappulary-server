@@ -42,10 +42,10 @@ router.get('/:id/items', (req, res) => {
 })
 
 router.patch('/edit/', (req, res) => {
+  // email is currently being ignored because of a need to interact with firebase.
+  const { id, currentLanguageId, nativeLanguageId/* , email */ } = req.body
 
-  const { id, currentLanguageId, nativeLanguageId, email } = req.body
-
-  db.editUser(id, currentLanguageId, nativeLanguageId, email)
+  db.editUser(id, currentLanguageId, nativeLanguageId/* , email */)
     .then(userRow => {
       res.status(200).json(userRow);
     })
