@@ -268,13 +268,11 @@ sequelize
           active: true,
       },
     ];
-    const langPromses = languages.map(lang => new Promise((res, rej) => {
-        Language.findOrCreate({
+    languages.forEach(async lang => 
+        await Language.findOrCreate({
           where: lang,
         })
-            .then(rows => res(rows))
-    }))
-    return Promise.all(langPromses);
+    )
   })
   .then(() => {
     // adds moch data
