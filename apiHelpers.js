@@ -85,9 +85,11 @@ const googleTextToSpeech = (word, languageCode = 'en') => {
             rej(err);
           }
           if (data) {
-            if (fs.exists(`${word}.mp3`)){
-              fs.unlinkSync(`${word}.mp3`);
-            }
+            fs.exists(`${word}.mp3`, (exists) => {
+              if(exists) {
+                fs.unlinkSync(`${word}.mp3`);
+              }
+            })
             console.log("Uploaded in:", data.Location);
             res(data.Location);
           }

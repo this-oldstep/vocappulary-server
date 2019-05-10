@@ -12,27 +12,26 @@ const { googleTranslate, googleTextToSpeech } = require('../apiHelpers');
 
 
 const findOrCreateTranslations = (collectionItemId, getAudio = false) => {
-  const persistingObj = {};
-    return CollectionItem.findOne({
-      where: {
-        id: collectionItemId,
-      }
-    })
+  
+  return CollectionItem.findOne({
+    where: {
+      id: collectionItemId,
+    }
+  })
     
     
     .then(collectionItemRow => {
-      persistingObj.collectionItemRow = collectionItemRow
-      return collectionItemRow.getCollection()
+      collectionItemRow
+      return Promise.all([collectionItemRow.getCollection(), collectionItemRow]);
     })
     
     
-    .then(collectionRow => {
-      return collectionRow.getUser();
+    .then(([collectionRow, collectionItemRow]) => {
+      return Promise.all([collectionRow.getUser(), collectionItemRow]);
     })
 
 
-    .then(userRow => {
-      persistingObj.userRow = userRow;
+    .then(([userRow, collectionItemRow]) => {
       // gets rows in the follwing order: collectionItem, native language, current language, english language
       const promisesArr = [
 
@@ -71,15 +70,11 @@ const findOrCreateTranslations = (collectionItemId, getAudio = false) => {
         }),
 
       ];
-      return Promise.all(promisesArr);
+      return Promise.all(promisesArr.concat([collectionItemRow]));
     })
 
 
-    .then(promisesReturn => {
-      collectionItemRow = persistingObj.collectionItemRow
-      persistingObj.nativeLanguageRow = nativeLanguageRow = promisesReturn[0];
-      persistingObj.currentLanguageRow = currentLanguageRow = promisesReturn[1];
-      persistingObj.englishLanguageRow = englishLanguageRow = promisesReturn[2];
+    .then(([nativeLanguageRow, currentLanguageRow, englishLanguageRow, collectionItemRow]) => {
 
       const translationPromisesArr = [
 
@@ -166,17 +161,15 @@ const findOrCreateTranslations = (collectionItemId, getAudio = false) => {
         }),
       ]
 
-      return Promise.all(translationPromisesArr);
+      return Promise.all(translationPromisesArr.concat([currentLanguageRow, collectionItemRow]));
     })
-    .then(nativeAndCurrentTranslationRow => {
-      persistingObj.nativeTranslationRow = nativeAndCurrentTranslationRow[0];
-      const currentTranslationRow = nativeAndCurrentTranslationRow[1];
+    .then(([nativeTranslationRow, currentTranslationRow, currentLanguageRow, collectionItemRow]) => {
       const currentAudioPromise = 
         new Promise((res, rej) => {
           if(currentTranslationRow.audio_url || !getAudio) {
             res(currentTranslationRow)
           } else {
-            googleTextToSpeech(currentTranslationRow.text, persistingObj.currentLanguageRow.lang_code)
+            googleTextToSpeech(currentTranslationRow.text, currentLanguageRow.lang_code)
               
               .then(currentAudioUrl => {
                 return currentTranslationRow.update({
@@ -194,16 +187,16 @@ const findOrCreateTranslations = (collectionItemId, getAudio = false) => {
               })
           }
         })
-      return Promise.resolve(currentAudioPromise)
+      return Promise.all([currentAudioPromise].concat([nativeTranslationRow, collectionItemRow]))
     })
 
 
-    .then(currentTranslationRow => {
+    .then(([currentTranslationRow, nativeTranslationRow, collectionItemRow]) => {
       return {
-        itemId: persistingObj.collectionItemRow.id,
-        url_image: persistingObj.collectionItemRow.image_url,
+        itemId: collectionItemRow.id,
+        url_image: collectionItemRow.image_url,
         currentTranslation: currentTranslationRow.text,
-        nativeTranslation: persistingObj.nativeTranslationRow.text,
+        nativeTranslation: nativeTranslationRow.text,
         currentAudioUrl: currentTranslationRow.audio_url,
       }
     })
@@ -465,7 +458,7 @@ const getAllCollectionItemsForUser = (userId) => {
         return seed.concat(array);
       }, []).map(userCollectionItem => 
         new Promise((res, rej) => {
-          findOrCreateTranslations(userCollectionItem.id)
+          findOrCreateTranslations(userCollectionItem.id, true)
             .then(userCollectionItemRow => {
               res(userCollectionItemRow);
             })
