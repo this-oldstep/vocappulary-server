@@ -119,7 +119,7 @@ const googleSpeechToText = async (binary) => {
   // Reads a local audio file and converts it to base64
   // const file = fs.readFileSync(fileName);
   // const audioBytes = file.toString('base64');
-  const audioBytes = btoa(binary);
+  const audioBytes = binary
 
   // The audio file's encoding, sample rate in hertz, and BCP-47 language code
   const audio = {
@@ -128,7 +128,7 @@ const googleSpeechToText = async (binary) => {
   const config = {
     encoding: 'LINEAR16',
     sampleRateHertz: 16000,
-    languageCode: 'en-US',
+    languageCode: 'es',
   };
   const request = {
     audio: audio,
@@ -145,15 +145,16 @@ const googleSpeechToText = async (binary) => {
 
 
 (async() => {
-  let yeetus = await fs.readFileSync('./word.mp3')
-  googleSpeechToText(yeetus)
+  let file = await fs.readFileSync('./corda.mp3');
+  let word = file.toString('base64');
+  googleSpeechToText(word)
     .then(lmao => {
       console.log(lmao)
     })
     .catch(err => {
       console.error(err);
     })
-})()
+})
 
 
 module.exports = {
