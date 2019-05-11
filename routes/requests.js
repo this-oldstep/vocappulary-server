@@ -41,7 +41,22 @@ router.post('/accept', (req, res) => {
       res.sendStatus(201);
     })
     .catch(err => {
-      console.err(err);
+      console.error(err);
+      res.sendStatus(500);
+    })
+
+})
+
+router.post('/reject', (req, res) => {
+
+  const { userId, rejectedBuddyId } = req.body;
+
+  db.rejectBuddyRequest(userId, rejectedBuddyId)
+    .then(() => {
+      res.sendStatus(201);
+    })
+    .catch(err => {
+      console.error(err);
       res.sendStatus(500);
     })
 

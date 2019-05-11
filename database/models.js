@@ -550,17 +550,19 @@ const getBuddies = (userId) => {
 
 
 const getRequests = (userId) => {
-
+  return Request.findAll({
+    where: {
+      potentialBuddyId: userId,
+    }
+  })
 }
 
 
 
 const sendRequest = (userId, potentialBuddyId) => {
   return Request.create({
-    where: {
-      requesterId: userId,
-      potentialBuddyId: potentialBuddyId,
-    }
+    requesterId: userId,
+    potentialBuddyId: potentialBuddyId,
   })
 }
 
@@ -574,15 +576,26 @@ const acceptBuddyRequest = (userId, newBuddyId) => {
     }
   })
   .then(requestRow => {
-    return requestRow.destroy();
-  })
-  .then(destroyedRequestRow => {
+    requestRow.destroy();
     return Buddies.create({
-      user1Id: destroyedRequestRow.requesterId,
-      user2Id: destroyedRequestRow.potentialBuddyId,
+      buddy1Id: requestRow.requesterId,
+      buddy2Id: requestRow.potentialBuddyId,
     })
   })
 };
+
+const rejectBuddyRequest = (userId, rejectedBuddyId) => {
+  return Request.findOne({
+    where: {
+      potentialBuddyId: userId,
+      requesterId: rejectedBuddyId,
+    }
+  })
+  .then(requestRow => {
+    return requestRow.destroy();
+  })
+
+}
 
 
 
@@ -626,6 +639,7 @@ module.exports.db = {
   getRequests,
   sendRequest,
   acceptBuddyRequest,
+  rejectBuddyRequest,
   getPotentialBuddies,
   getMessages,
   addMessage,
