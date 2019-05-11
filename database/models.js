@@ -488,7 +488,13 @@ const getAllCollections = userId =>
  */
 const getAllLanguages = () => Language.findAll();
 
-
+const getLanguageById = (languageId) => {
+  return Language.findOne({
+    where: {
+      userId: languageId
+    }
+  })
+}
 
 const makeUser = (username, email, currentLanguageId, nativeLanguageId, points) => 
   User.create({username, email, currentLanguageId, nativeLanguageId, points})
@@ -550,5 +556,6 @@ module.exports.db = {
   deleteCollection,
   findOrCreateTranslations,
   getAllCollectionItemsForUser,
-  editUser
+  editUser,
+  getLanguageById,
 };
