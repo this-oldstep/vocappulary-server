@@ -23,11 +23,13 @@ router.post('/', (req, res) => {
 
   const { fileUploaded } = req.files;
 
-  let audio = Buffer.from(fileUploaded.data).toString("base64");
+  const { userId, currentLanguageId, word } = req.body;
 
-  googleSpeechToText(audio)
+  let audio = Buffer.from(fileUploaded.data).toString("base64");
+//currentLanguageId, userId
+  googleSpeechToText(audio, currentLanguageId, word, userId)
     .then(transcription => {
-      console.log(transcription);
+      res.send(transcription)
     });
 
 });

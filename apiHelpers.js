@@ -6,6 +6,8 @@ const AWS = require('aws-sdk');
 const path = require('path');
 const client = new textToSpeech.TextToSpeechClient();
 const speech = require('@google-cloud/speech');
+const { getLanguageById } = require('./database/models.js')
+const { Language, User } = require('./database/config.js')
 
 
 
@@ -106,31 +108,58 @@ const googleTextToSpeech = (word, languageCode = 'en') => {
 
 
 
-const googleSpeechToText = async (base64) => {
+const googleSpeechToText = async (base64, currentLanguageId, word, userId) => {
   
-  // Creates a client
+  
   const client = new speech.SpeechClient();
 
+
+
   // The audio file's encoding, sample rate in hertz, and BCP-47 language code
+  let language = await Language.findOne({
+    where: {
+      id: currentLanguageId
+    }
+  })
   const audio = {
     content: base64,
   };
   const config = {
     encoding: 'AMR_WB',
     sampleRateHertz: 16000,
-    languageCode: 'en-US',
+    languageCode: language.lang_code,
   };
   const request = {
     audio: audio,
     config: config,
   };
+      const [response] = await client.recognize(request);
+      const transcription = response.results
+      .map(result => result.alternatives[0].transcript)
+      .join('\n');
+      if (transcription.includes(word)){
+        let points = await User.findOne({
+          where:{
+            id: userId
+          }
+        })
+        points = points.points + 1;
+        User.update({
+          points: points
+        }, {
+          where: {
+            id: userId
+          },
+        })
+
+        return true
+      }
+      else{
+        return false
+      }
+
 
   // Detects speech in the audio file
-  const [response] = await client.recognize(request);
-  const transcription = response.results
-    .map(result => result.alternatives[0].transcript)
-    .join('\n');
-  return transcription
 }
 
 
