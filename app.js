@@ -4,8 +4,11 @@ const app = express();
 const router = express.Router();
 const bodyParser = require('body-parser');
 const { db } = require("./database/models")
+const fileUpload = require('express-fileupload')
 
-
+app.use(fileUpload({
+  limits: { fileSize: 50 * 1024 * 1024 },
+}));
 app.use(bodyParser.json({ type: 'application/json'}));
 
 ///////////////
@@ -19,6 +22,7 @@ const collections = require('./routes/collections');
 const collectionItems = require('./routes/collectionItems');
 const auth = require('./routes/auth');
 const user = require('./routes/user');
+const speechToText = require('./routes/speech-to-text')
 
 ///////////////
 
@@ -28,6 +32,7 @@ app.use('/collections', collections);
 app.use('/collectionItems', collectionItems);
 app.use('/auth', auth);
 app.use('/user', user);
+app.use('/upload', speechToText);
 
 ///////////////
 
