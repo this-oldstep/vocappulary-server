@@ -32,7 +32,7 @@ app.use('/collections', collections);
 app.use('/collectionItems', collectionItems);
 app.use('/auth', auth);
 app.use('/user', user);
-app.use('/speechtotext', speechToText);
+app.use('/upload', speechToText);
 
 ///////////////
 

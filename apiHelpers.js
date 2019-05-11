@@ -6,7 +6,7 @@ const AWS = require('aws-sdk');
 const path = require('path');
 const client = new textToSpeech.TextToSpeechClient();
 const speech = require('@google-cloud/speech');
-const btoa = require('btoa');
+
 
 
 //Configuring AWS environment
@@ -104,31 +104,19 @@ const googleTextToSpeech = (word, languageCode = 'en') => {
 
 
 
-const googleSpeechToText = async (binary) => {
-
-  // Imports the Google Cloud client library
-  // const speech = require('@google-cloud/speech');
-  // const fs = require('fs');
+const googleSpeechToText = async (base64) => {
   
   // Creates a client
   const client = new speech.SpeechClient();
 
-  // The name of the audio file to transcribe
-  // const fileName = `./resources/audio.raw`;
-
-  // Reads a local audio file and converts it to base64
-  // const file = fs.readFileSync(fileName);
-  // const audioBytes = file.toString('base64');
-  const audioBytes = binary
-
   // The audio file's encoding, sample rate in hertz, and BCP-47 language code
   const audio = {
-    content: audioBytes,
+    content: base64,
   };
   const config = {
-    encoding: 'LINEAR16',
+    encoding: 'AMR_WB',
     sampleRateHertz: 16000,
-    languageCode: 'es',
+    languageCode: 'en-US',
   };
   const request = {
     audio: audio,
@@ -140,24 +128,13 @@ const googleSpeechToText = async (binary) => {
   const transcription = response.results
     .map(result => result.alternatives[0].transcript)
     .join('\n');
-  console.log(`Transcription: ${transcription}`);
+  return transcription
 }
 
-
-(async() => {
-  let file = await fs.readFileSync('./corda.mp3');
-  let word = file.toString('base64');
-  googleSpeechToText(word)
-    .then(lmao => {
-      console.log(lmao)
-    })
-    .catch(err => {
-      console.error(err);
-    })
-})
 
 
 module.exports = {
   googleTranslate,
   googleTextToSpeech, 
+  googleSpeechToText,
 }
