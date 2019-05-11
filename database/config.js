@@ -1,5 +1,7 @@
 const Sequelize = require('sequelize');
 
+const { Model } = Sequelize;
+
 ////////////////////
 ////CONNECTION//////
 ///////////////////
@@ -8,7 +10,7 @@ const sequelize = new Sequelize('vocapp', process.env.DB_USER, process.env.DB_PA
   host: process.env.DB_HOST,
   port: process.env.DB_PORT,
   dialect: 'postgres',
-  logging: false,
+  // logging: false,
 });
 
 ////////////////////
@@ -106,17 +108,6 @@ const Word = sequelize.define('word', {
   }
 })
 
-//Lessons //
-
-const Lesson = sequelize.define('lesson', {
-  id: {
-    type: Sequelize.INTEGER,
-    autoIncrement: true,
-    allowNull: false,
-    primaryKey: true
-  },
-})
-
 //Translations//
 
 const Translation = sequelize.define('translation', {
@@ -134,11 +125,25 @@ const Translation = sequelize.define('translation', {
   }
 });
 
+//Messages//
+
+class Message extends Model {};
+Message.init({
+  text: Sequelize.BIGINT,
+}, {
+  sequelize,
+  modelName: 'message',
+  underscored: false,
+});
 
 
 ////////////////////
 ////RELATIONSHIPS///
 ////////////////////
+
+//makes buddies table//
+Buddies = sequelize.define('buddies')
+Request = sequelize.define('requests')
 
 //Language OTM Users - native language //
 User.belongsTo(Language, {as: 'native_language'});
@@ -152,10 +157,6 @@ Language.hasOne(User, {as: 'current_language'});
 Collection.belongsTo(User);
 User.hasMany(Collection);
 
-//User-Languages MTM //
-User.belongsToMany(Language, { as: 'user', through: { model: Lesson, unique: false }});
-Language.belongsToMany(User, { as: 'user', through: { model: Lesson, unique: false }});
-
 //Words-Languages MTM //
 Word.belongsToMany(Language, {as: 'word', through: {model: Translation, unique: false}});
 Language.belongsToMany(Word, {as: 'word', through: {model: Translation, unique: false}});
@@ -168,7 +169,17 @@ Word.hasOne(CollectionItem);
 CollectionItem.belongsTo(Collection);
 Collection.hasMany(CollectionItem);
 
+//Buddies//
+User.belongsToMany(User, {as: "buddy1Id", through: {model: Buddies}, foreignKey: "buddy1Id"});
+User.belongsToMany(User, {as: "buddy2Id", through: {model: Buddies}, foreignKey: "buddy2Id"});
 
+//Requests//
+User.belongsToMany(User, {as: "requesterId", through: {model: Request}, foreignKey: "requesterId"});
+User.belongsToMany(User, {as: "potentialBuddyId", through: {model: Request}, foreignKey: "potentialBuddyId"});
+
+//Messages//
+User.belongsToMany(User, {as: "senderId", through: {model: Message}, foreignKey: "senderId"});
+User.belongsToMany(User, {as: "receiverId", through: {model: Message}, foreignKey: "receiverId"});
 
 /////////////////////
 /////HELPERS/////////
@@ -184,7 +195,7 @@ Collection.hasMany(CollectionItem);
 
 
 sequelize
-  .sync(/* {force: true} */)
+  .sync({force: true})
   .then(result => {
     console.log('succesfully connected to database');
     // adds languages if they do not exist
@@ -287,10 +298,15 @@ sequelize
 ///////EXPORTS////////
 //////////////////////
 
-module.exports.Collection = Collection;
-module.exports.CollectionItem = CollectionItem;
-module.exports.User = User;
-module.exports.Language = Language;
-module.exports.Word = Word;
-module.exports.Lesson = Lesson;
-module.exports.Translation = Translation;
+
+module.exports = {
+  Collection,
+  CollectionItem,
+  User,
+  Language,
+  Word,
+  Translation,
+  Buddies,
+  Request,
+  Message,
+};

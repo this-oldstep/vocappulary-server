@@ -3,9 +3,11 @@ const {
   CollectionItem, 
   User, 
   Language, 
-  Word, 
-  Lesson, 
+  Word,
   Translation,
+  Buddies,
+  Request,
+  Message,
 } = require("./config");
 
 const { googleTranslate, googleTextToSpeech } = require('../apiHelpers');
@@ -531,7 +533,64 @@ const editUser = (userId, currentLanguageId, nativeLanguageId, email) => {
     .then(userRow => {
       return userRow.update(updateObj, {fields});
     })
+};
+
+
+
+const getBuddies = (userId) => {
+
 }
+
+
+
+const getRequests = (userId) => {
+
+}
+
+
+
+const sendRequest = (userId, potentialBuddyId) => {
+
+}
+
+
+
+const acceptBuddyRequest = (userId, newBuddyId) => {
+  return Request.findOne({
+    where: {
+      potentialBuddyId: userId,
+      requesterId: newBuddyId,
+    }
+  })
+  .then(requestRow => {
+    return requestRow.destroy();
+  })
+  .then(destroyedRequestRow => {
+    return Buddies.create({
+      user1Id: destroyedRequestRow.requesterId,
+      user2Id: destroyedRequestRow.potentialBuddyId,
+    })
+  })
+};
+
+
+
+const getPotentialBuddies = (userId) => {
+
+}
+
+
+
+const getMessages = (userId, buddyId) => {
+
+}
+
+
+
+const addMessage = (userId, buddyId) => {
+
+}
+
 
 
 module.exports.db = {
@@ -550,5 +609,12 @@ module.exports.db = {
   deleteCollection,
   findOrCreateTranslations,
   getAllCollectionItemsForUser,
-  editUser
+  editUser,
+  getBuddies,
+  getRequests,
+  sendRequest,
+  acceptBuddyRequest,
+  getPotentialBuddies,
+  getMessages,
+  addMessage,
 };

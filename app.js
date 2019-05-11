@@ -22,7 +22,10 @@ const collections = require('./routes/collections');
 const collectionItems = require('./routes/collectionItems');
 const auth = require('./routes/auth');
 const user = require('./routes/user');
-const speechToText = require('./routes/speech-to-text')
+const speechToText = require('./routes/speech-to-text');
+const buddies = require('./routes/buddies');
+const messages = require('./routes/messages');
+const requests = require('./routes/requests');
 
 ///////////////
 
@@ -33,6 +36,9 @@ app.use('/collectionItems', collectionItems);
 app.use('/auth', auth);
 app.use('/user', user);
 app.use('/upload', speechToText);
+app.use('/buddies', buddies);
+app.use('/messages', messages);
+app.use('/requests', requests);
 
 ///////////////
 
