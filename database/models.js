@@ -556,7 +556,12 @@ const getRequests = (userId) => {
 
 
 const sendRequest = (userId, potentialBuddyId) => {
-
+  return Request.create({
+    where: {
+      requesterId: userId,
+      potentialBuddyId: potentialBuddyId,
+    }
+  })
 }
 
 
@@ -617,4 +622,11 @@ module.exports.db = {
   getAllCollectionItemsForUser,
   editUser,
   getLanguageById,
+  getBuddies,
+  getRequests,
+  sendRequest,
+  acceptBuddyRequest,
+  getPotentialBuddies,
+  getMessages,
+  addMessage,
 };
