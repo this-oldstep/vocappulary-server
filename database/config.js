@@ -10,7 +10,7 @@ const sequelize = new Sequelize('vocapp', process.env.DB_USER, process.env.DB_PA
   host: process.env.DB_HOST,
   port: process.env.DB_PORT,
   dialect: 'postgres',
-  // logging: false,
+  logging: false,
 });
 
 ////////////////////
@@ -195,7 +195,7 @@ User.belongsToMany(User, {as: "receiverId", through: {model: Message}, foreignKe
 
 
 sequelize
-  .sync({force: true})
+  .sync(/* {force: true} */)
   .then(result => {
     console.log('succesfully connected to database');
     // adds languages if they do not exist
