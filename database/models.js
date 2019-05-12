@@ -660,7 +660,7 @@ const getPotentialBuddies = (userId) => {
             [Op.not]: buddiesRows.reduce((seed, buddyRow) => {
               return seed.concat([buddyRow.buddy1Id, buddyRow.buddy2Id]);
             }, [])
-            .concat(userRequestRows.reduce(userRequestRow => {
+            .concat(userRequestRows.reduce((seed, userRequestRow) => {
               return seed.concat([userRequestRow.potentialBuddyId, userRequestRow.requesterId]);
             }, []))
           }
