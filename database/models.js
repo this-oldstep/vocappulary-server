@@ -1,14 +1,18 @@
+const { Op } = require('sequelize');
 const { 
   Collection, 
   CollectionItem, 
   User, 
   Language, 
-  Word, 
-  Lesson, 
+  Word,
   Translation,
+  Buddies,
+  Request,
+  Message,
 } = require("./config");
-
 const { googleTranslate, googleTextToSpeech } = require('../apiHelpers');
+
+
 
 
 const findOrCreateTranslations = (collectionItemId, getAudio = false) => {
@@ -537,7 +541,193 @@ const editUser = (userId, currentLanguageId, nativeLanguageId, email) => {
     .then(userRow => {
       return userRow.update(updateObj, {fields});
     })
+};
+
+
+
+const getBuddies = (userId) => {
+  return User.findOne({
+    where: {
+      id: userId,
+    }
+  })
+    .then(userRow => {
+      return Promise.all([
+        userRow.getBuddy1s(),
+        userRow.getBuddy2s()
+      ])
+    })
+    .then(([buddySet1, buddySet2]) => {
+      return buddySet1.concat(buddySet2).map(buddyRow => ({
+        id: buddyRow.id,
+        username: buddyRow.username,
+        nativeLanguageId: buddyRow.nativeLanguageId,
+        currentLanguageId: buddyRow.currentLanguageId,
+      }));
+    })
 }
+
+
+
+const getRequests = (userId) => {
+  return User.findOne({
+    where: {
+      id: userId,
+    }
+  })
+  .then(userRow => {
+    return userRow.getPotentialBuddies()
+  })
+  .then(potentialBuddyRows => {
+    return potentialBuddyRows.map(potentialBuddyRow => ({
+      id: potentialBuddyRow.id,
+      username: potentialBuddyRow.username,
+      nativeLanguageId: potentialBuddyRow.nativeLanguageId,
+      currentLanguageId: potentialBuddyRow.currentLanguageId,
+    }))
+  })
+}
+
+
+
+const sendRequest = (userId, potentialBuddyId) => {
+  return Request.create({
+    requesterId: userId,
+    potentialBuddyId: potentialBuddyId,
+  })
+}
+
+
+
+const acceptBuddyRequest = (userId, newBuddyId) => {
+  return Request.findOne({
+    where: {
+      potentialBuddyId: userId,
+      requesterId: newBuddyId,
+    }
+  })
+  .then(requestRow => {
+    requestRow.destroy();
+    return Buddies.create({
+      buddy1Id: requestRow.requesterId,
+      buddy2Id: requestRow.potentialBuddyId,
+    })
+  })
+};
+
+const rejectBuddyRequest = (userId, rejectedBuddyId) => {
+  return Request.findOne({
+    where: {
+      potentialBuddyId: userId,
+      requesterId: rejectedBuddyId,
+    }
+  })
+  .then(requestRow => {
+    return requestRow.destroy();
+  })
+
+}
+
+
+
+const getPotentialBuddies = (userId) => {
+  return Request.findAll({
+    where: {
+      [Op.or]: {
+        potentialBuddyId: userId,
+        requesterId: userId,
+      },
+    },
+  })
+
+
+    .then(userRequestRows => {
+      return Promise.all([
+        Buddies.findAll({
+          where: {
+            [Op.or]: [{buddy1Id: userId}, {buddy2Id: userId}],
+          }
+        }),
+        userRequestRows
+      ])
+    })
+
+
+    .then(([buddiesRows, userRequestRows]) => {
+      return User.findAll({
+        where: {
+          id: {
+            [Op.not]: buddiesRows.reduce((seed, buddyRow) => {
+              return seed.concat([buddyRow.buddy1Id, buddyRow.buddy2Id]);
+            }, [])
+            .concat(userRequestRows.reduce(userRequestRow => {
+              return seed.concat([userRequestRow.potentialBuddyId, userRequestRow.requesterId]);
+            }, []))
+          }
+        }
+      })
+
+
+      .then(userRows => {
+        return Promise.all(
+          userRows.map(userRow => {
+            return new Promise((resOuter, rej) => {
+              Promise.all([
+                new Promise((res, rej) => {
+                  userRow.getNative_language()
+                    .then(nativeLanguageRow => {
+                      res(nativeLanguageRow);
+                    })
+                    .catch(err => {
+                      rej(err);
+                    })
+                }),
+
+                new Promise((res, rej) => {
+                  userRow.getCurrent_language()
+                    .then(currentLanguageRow => {
+                      res(currentLanguageRow)
+                    })
+                    .catch(err => {
+                      rej(err);
+                    })
+                })
+
+              ])
+
+
+                .then(([nativeLanguage, currentLanguage]) => {
+                  resOuter({
+                    id: userRow.id,
+                    username: userRow.username,
+                    nativeLanguage,
+                    currentLanguage,
+                  })
+                })
+
+
+                .catch(err => {
+                  rej(err);
+                });
+            });
+          })
+        );
+      });
+    });
+};
+
+
+
+const getMessages = (userId, buddyId) => {
+
+}
+
+
+
+const addMessage = (userId, buddyId) => {
+
+}
+
 
 
 module.exports.db = {
@@ -558,4 +748,12 @@ module.exports.db = {
   getAllCollectionItemsForUser,
   editUser,
   getLanguageById,
+  getBuddies,
+  getRequests,
+  sendRequest,
+  acceptBuddyRequest,
+  rejectBuddyRequest,
+  getPotentialBuddies,
+  getMessages,
+  addMessage,
 };
