@@ -170,16 +170,16 @@ CollectionItem.belongsTo(Collection);
 Collection.hasMany(CollectionItem);
 
 //Buddies//
-User.belongsToMany(User, {as: "buddy1Id", through: {model: Buddies}, foreignKey: "buddy1Id"});
-User.belongsToMany(User, {as: "buddy2Id", through: {model: Buddies}, foreignKey: "buddy2Id"});
+User.belongsToMany(User, {as: {singular: "buddy1", plural: "buddy1s"}, through: {model: Buddies}, foreignKey: "buddy1Id"});
+User.belongsToMany(User, {as: {singular: "buddy2", plural: "buddy2s"}, through: {model: Buddies}, foreignKey: "buddy2Id"});
 
 //Requests//
-User.belongsToMany(User, {as: "requesterId", through: {model: Request}, foreignKey: "requesterId"});
-User.belongsToMany(User, {as: "potentialBuddyId", through: {model: Request}, foreignKey: "potentialBuddyId"});
+User.belongsToMany(User, {as: {singular: "requester", plural:"requesters"}, through: {model: Request}, foreignKey: "requesterId"});
+User.belongsToMany(User, {as: {singular: "potentialBuddy", plural: "potentialBuddies"}, through: {model: Request}, foreignKey: "potentialBuddyId"});
 
 //Messages//
-User.belongsToMany(User, {as: "senderId", through: {model: Message}, foreignKey: "senderId"});
-User.belongsToMany(User, {as: "receiverId", through: {model: Message}, foreignKey: "receiverId"});
+User.belongsToMany(User, {as: {singular: "sender", plural: "senders"}, through: {model: Message}, foreignKey: "senderId"});
+User.belongsToMany(User, {as: {singular: "receiver", plural: "receivers"}, through: {model: Message}, foreignKey: "receiverId"});
 
 /////////////////////
 /////HELPERS/////////

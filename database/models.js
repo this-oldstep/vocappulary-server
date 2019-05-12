@@ -546,20 +546,45 @@ const editUser = (userId, currentLanguageId, nativeLanguageId, email) => {
 
 
 const getBuddies = (userId) => {
-  return Buddies.findAll({
+  return User.findOne({
     where: {
-      [Op.or]: [{buddy1Id: userId}, {buddy2Id: userId}]
+      id: userId,
     }
   })
+    .then(userRow => {
+      return Promise.all([
+        userRow.getBuddy1s(),
+        userRow.getBuddy2s()
+      ])
+    })
+    .then(([buddySet1, buddySet2]) => {
+      return buddySet1.concat(buddySet2).map(buddyRow => ({
+        id: buddyRow.id,
+        username: buddyRow.username,
+        nativeLanguageId: buddyRow.nativeLanguageId,
+        currentLanguageId: buddyRow.currentLanguageId,
+      }));
+    })
 }
 
 
 
 const getRequests = (userId) => {
-  return Request.findAll({
+  return User.findOne({
     where: {
-      potentialBuddyId: userId,
+      id: userId,
     }
+  })
+  .then(userRow => {
+    return userRow.getPotentialBuddies()
+  })
+  .then(potentialBuddyRows => {
+    return potentialBuddyRows.map(potentialBuddyRow => ({
+      id: potentialBuddyRow.id,
+      username: potentialBuddyRow.username,
+      nativeLanguageId: potentialBuddyRow.nativeLanguageId,
+      currentLanguageId: potentialBuddyRow.currentLanguageId,
+    }))
   })
 }
 
