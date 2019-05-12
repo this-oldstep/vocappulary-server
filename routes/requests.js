@@ -62,4 +62,19 @@ router.post('/reject', (req, res) => {
 
 })
 
+router.get('/potential/:userId', (req, res) => {
+  
+  const { userId } = req.params;
+
+  db.getPotentialBuddies(userId)
+    .then(potentialBuddies => {
+      res.json(potentialBuddies);
+    })
+    .then(err => {
+      console.error(err);
+      res.sendStatus(500);
+    })
+
+})
+
 module.exports = router;

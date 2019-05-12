@@ -1,3 +1,4 @@
+const { Op } = require('sequelize');
 const { 
   Collection, 
   CollectionItem, 
@@ -9,8 +10,9 @@ const {
   Request,
   Message,
 } = require("./config");
-
 const { googleTranslate, googleTextToSpeech } = require('../apiHelpers');
+
+
 
 
 const findOrCreateTranslations = (collectionItemId, getAudio = false) => {
@@ -544,7 +546,11 @@ const editUser = (userId, currentLanguageId, nativeLanguageId, email) => {
 
 
 const getBuddies = (userId) => {
-
+  return Buddies.findAll({
+    where: {
+      [Op.or]: [{buddy1Id: userId}, {buddy2Id: userId}]
+    }
+  })
 }
 
 
@@ -600,8 +606,90 @@ const rejectBuddyRequest = (userId, rejectedBuddyId) => {
 
 
 const getPotentialBuddies = (userId) => {
+  return Request.findAll({
+    where: {
+      [Op.or]: {
+        potentialBuddyId: userId,
+        requesterId: userId,
+      },
+    },
+  })
 
-}
+
+    .then(userRequestRows => {
+      return Promise.all([
+        Buddies.findAll({
+          where: {
+            [Op.or]: [{buddy1Id: userId}, {buddy2Id: userId}],
+          }
+        }),
+        userRequestRows
+      ])
+    })
+
+
+    .then(([buddiesRows, userRequestRows]) => {
+      return User.findAll({
+        where: {
+          id: {
+            [Op.not]: buddiesRows.reduce((seed, buddyRow) => {
+              return seed.concat([buddyRow.buddy1Id, buddyRow.buddy2Id]);
+            }, [])
+            .concat(userRequestRows.reduce(userRequestRow => {
+              return seed.concat([userRequestRow.potentialBuddyId, userRequestRow.requesterId]);
+            }, []))
+          }
+        }
+      })
+
+
+      .then(userRows => {
+        return Promise.all(
+          userRows.map(userRow => {
+            return new Promise((resOuter, rej) => {
+              Promise.all([
+                new Promise((res, rej) => {
+                  userRow.getNative_language()
+                    .then(nativeLanguageRow => {
+                      res(nativeLanguageRow);
+                    })
+                    .catch(err => {
+                      rej(err);
+                    })
+                }),
+
+                new Promise((res, rej) => {
+                  userRow.getCurrent_language()
+                    .then(currentLanguageRow => {
+                      res(currentLanguageRow)
+                    })
+                    .catch(err => {
+                      rej(err);
+                    })
+                })
+
+              ])
+
+
+                .then(([nativeLanguage, currentLanguage]) => {
+                  resOuter({
+                    id: userRow.id,
+                    username: userRow.username,
+                    nativeLanguage,
+                    currentLanguage,
+                  })
+                })
+
+
+                .catch(err => {
+                  rej(err);
+                });
+            });
+          })
+        );
+      });
+    });
+};
 
 
 
