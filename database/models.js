@@ -719,15 +719,11 @@ const getPotentialBuddies = (userId) => {
 
 
 const getMessages = (userId, buddyId) => {
-  return User.findOne({
+  return Message.findAll({
     where: {
-      id: userId
+      [Op.or]: {senderId: userId, recieverId: userId}
     }
   })
-    .then(userRow => {
-      return userRow.getRecievers()
-    })
-    
 }
 
 
