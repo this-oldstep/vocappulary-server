@@ -70,7 +70,7 @@ router.get('/potential/:userId', (req, res) => {
     .then(potentialBuddies => {
       res.json(potentialBuddies);
     })
-    .then(err => {
+    .catch(err => {
       console.error(err);
       res.sendStatus(500);
     })

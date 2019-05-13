@@ -3,13 +3,23 @@ const express = require('express');
 const app = express();
 const router = express.Router();
 const bodyParser = require('body-parser');
-const { db } = require("./database/models")
-const fileUpload = require('express-fileupload')
+const { db } = require("./database/models");
+const fileUpload = require('express-fileupload');
+const WebSocket = require('ws');
+
 
 app.use(fileUpload({
   limits: { fileSize: 50 * 1024 * 1024 },
 }));
 app.use(bodyParser.json({ type: 'application/json'}));
+
+
+//////////////
+// WebSocket /
+//////////////
+
+
+
 
 ///////////////
 /// Routes ////
@@ -56,4 +66,19 @@ app.get('/languages', (req, res) => {
 
 app.get('/', (req, res) => res.send('Hello World!'));
 const port = 3000;
-app.listen(port, () => console.log(`Vocapp server listening on port ${port}!`));
+const server = new WebSocket.Server({ 
+  server: app.listen(port, () => console.log(`Vocapp server listening on port ${port}!`))
+});
+
+const logIt = () => {
+  console.log("it did the thing");
+}
+
+
+server.on('connection', socket => {
+  socket.on('message', message => {
+    console.log(`received from a client: ${message}`);
+  });
+  socket.send('Hello world!');
+  logIt();
+});

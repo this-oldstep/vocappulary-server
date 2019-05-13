@@ -2,6 +2,12 @@ const express = require('express');
 const router = express.Router();
 const { db } = require('../database/models.js');
 
+
+
+
+
+
+
 // router.get('/all', (req, res) => {
 
 //   const { userId, buddyId } = req.body;
@@ -24,7 +30,13 @@ const { db } = require('../database/models.js');
 //   const { userId, buddyId } = req.body;
 
 //   db.addMessage(userId, buddyId)
-//     .then()
+//     .then(newMessage => {
+//       res.json(newMessage);
+//     })
+//     .catch(err => {
+//       console.error(err);
+//       res.sendStatus(500);
+//     })
 
 // })
 
