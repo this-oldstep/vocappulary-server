@@ -1,11 +1,12 @@
 require('dotenv').config();
 const express = require('express');
-const app = express();
+// const app = express();
+const { app } = require('./appAndSocketInitialize');
 const router = express.Router();
 const bodyParser = require('body-parser');
 const { db } = require("./database/models");
 const fileUpload = require('express-fileupload');
-const WebSocket = require('ws');
+// const WebSocket = require('ws');
 
 
 app.use(fileUpload({
@@ -64,21 +65,22 @@ app.get('/languages', (req, res) => {
 })
 
 
-app.get('/', (req, res) => res.send('Hello World!'));
-const port = 3000;
-const server = new WebSocket.Server({ 
-  server: app.listen(port, () => console.log(`Vocapp server listening on port ${port}!`))
-});
+// app.get('/', (req, res) => res.send('Hello World!'));
+// const port = 3000;
+// const server = new WebSocket.Server({ 
+//   server: app.listen(port, () => console.log(`Vocapp server listening on port ${port}!`)),
+//   port: 4000,
+// });
 
-const logIt = () => {
-  console.log("it did the thing");
-}
+// const logIt = () => {
+//   console.log("it did the thing");
+// }
 
 
-server.on('connection', socket => {
-  socket.on('message', message => {
-    console.log(`received from a client: ${message}`);
-  });
-  socket.send('Hello world!');
-  logIt();
-});
+// server.on('connection', socket => {
+//   socket.on('message', message => {
+//     console.log(`received from a client: ${message}`);
+//   });
+//   socket.send(JSON.stringify({message: 'Hello world!'}));
+//   logIt();
+// });
