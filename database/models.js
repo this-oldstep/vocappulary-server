@@ -37,7 +37,8 @@ const findOrCreateTranslations = (collectionItemId, getAudio = false) => {
 
     .then(([userRow, collectionItemRow]) => {
       // gets rows in the follwing order: collectionItem, native language, current language, english language
-      const promisesArr = [
+      // const promisesArr = [
+      return Promise.all([
 
         new Promise((res, rej) => {
           userRow.getNative_language()
@@ -73,14 +74,17 @@ const findOrCreateTranslations = (collectionItemId, getAudio = false) => {
             })
         }),
 
-      ];
-      return Promise.all(promisesArr.concat([collectionItemRow]));
+        collectionItemRow
+
+      ]);
+      // return Promise.all(promisesArr.concat([collectionItemRow]));
     })
 
 
     .then(([nativeLanguageRow, currentLanguageRow, englishLanguageRow, collectionItemRow]) => {
 
-      const translationPromisesArr = [
+      // const translationPromisesArr = [
+      return Promise.all([
 
         new Promise((res, rej) => {
           Translation.findOne({
@@ -163,12 +167,40 @@ const findOrCreateTranslations = (collectionItemId, getAudio = false) => {
               rej(err);
             })
         }),
-      ]
 
-      return Promise.all(translationPromisesArr.concat([currentLanguageRow, collectionItemRow]));
+        currentLanguageRow, 
+        
+        collectionItemRow,
+      
+      ])
+
+      // return Promise.all(translationPromisesArr.concat([currentLanguageRow, collectionItemRow]));
     })
     .then(([nativeTranslationRow, currentTranslationRow, currentLanguageRow, collectionItemRow]) => {
-      const currentAudioPromise = 
+      // const currentAudioPromise = 
+      //   new Promise((res, rej) => {
+      //     if(currentTranslationRow.audio_url || !getAudio) {
+      //       res(currentTranslationRow)
+      //     } else {
+      //       googleTextToSpeech(currentTranslationRow.text, currentLanguageRow.lang_code)
+              
+      //         .then(currentAudioUrl => {
+      //           return currentTranslationRow.update({
+      //             audio_url: currentAudioUrl,
+      //           }, {
+      //             fields: ['audio_url']
+      //           })
+      //         })
+              
+      //         .then(currentTranslationRow => {
+      //           res(currentTranslationRow);
+      //         })
+      //         .catch(err => {
+      //           rej(err);
+      //         })
+      //     }
+      //   })
+      return Promise.all([
         new Promise((res, rej) => {
           if(currentTranslationRow.audio_url || !getAudio) {
             res(currentTranslationRow)
@@ -190,8 +222,10 @@ const findOrCreateTranslations = (collectionItemId, getAudio = false) => {
                 rej(err);
               })
           }
-        })
-      return Promise.all([currentAudioPromise].concat([nativeTranslationRow, collectionItemRow]))
+        }),
+        nativeTranslationRow,
+        collectionItemRow,
+      ])
     })
 
 
@@ -442,36 +476,37 @@ const getAllCollectionItemsForUser = (userId) => {
     }
   })
     .then(collectionRows => {
-      const collectionItemPromises = collectionRows.map(collectionRow => 
-        new Promise((res, rej) => {
-          // findOrCreateTranslations(collectionRow.id)
-          collectionRow.getCollection_items()
-            .then(collectionItemRows => {
-              res(collectionItemRows);
-            })
-            .catch(err => {
-              rej(err);
-            })
-        })
+      return Promise.all(
+        collectionRows.map(collectionRow => 
+          new Promise((res, rej) => {
+            // findOrCreateTranslations(collectionRow.id)
+            collectionRow.getCollection_items()
+              .then(collectionItemRows => {
+                res(collectionItemRows);
+              })
+              .catch(err => {
+                rej(err);
+              })
+          })
+        )
       )
-
-      return Promise.all(collectionItemPromises)
     })
     .then(unflattenedUserCollectionItems => {
-      const userCollectionItemPromises = unflattenedUserCollectionItems.reduce((seed, array) => {
-        return seed.concat(array);
-      }, []).map(userCollectionItem => 
-        new Promise((res, rej) => {
-          findOrCreateTranslations(userCollectionItem.id, true)
-            .then(userCollectionItemRow => {
-              res(userCollectionItemRow);
-            })
-            .catch(err => {
-              rej(err);
-            })
-        })
+      return Promise.all(
+        unflattenedUserCollectionItems.reduce((seed, array) => {
+          return seed.concat(array);
+        }, []).map(userCollectionItem => 
+          new Promise((res, rej) => {
+            findOrCreateTranslations(userCollectionItem.id, true)
+              .then(userCollectionItemRow => {
+                res(userCollectionItemRow);
+              })
+              .catch(err => {
+                rej(err);
+              })
+          })
+        )
       )
-      return Promise.all(userCollectionItemPromises)
     })
 }
 
