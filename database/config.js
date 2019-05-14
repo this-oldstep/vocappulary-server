@@ -184,14 +184,6 @@ User.hasMany(Message, {as: {singular: "sender", plural: "senders"}, foreignKey: 
 User.hasMany(Message, {as: {singular: "receiver", plural: "receivers"}, foreignKey: "receiverId"});
 
 /////////////////////
-/////HELPERS/////////
-/////////////////////
-
-
-
-
-
-/////////////////////
 ///////SYNC////////
 /////////////////////
 
