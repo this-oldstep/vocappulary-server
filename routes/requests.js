@@ -7,8 +7,8 @@ router.post('/new', (req, res) => {
   const { userId, potentialBuddyId } = req.body;
 
   db.sendRequest(userId, potentialBuddyId)
-    .then(() => {
-      res.sendStatus(201);
+    .then((request) => {
+      res.status(201).json(request);
     })
     .catch(err => {
       console.error(err);
@@ -37,8 +37,8 @@ router.post('/accept', (req, res) => {
   const { userId, newBuddyId } = req.body;
 
   db.acceptBuddyRequest(userId, newBuddyId)
-    .then(() => {
-      res.sendStatus(201);
+    .then((buddyRow) => {
+      res.status(201).json(buddyRow);
     })
     .catch(err => {
       console.error(err);
@@ -53,7 +53,7 @@ router.post('/reject', (req, res) => {
 
   db.rejectBuddyRequest(userId, rejectedBuddyId)
     .then(() => {
-      res.sendStatus(201);
+      res.status(201).json("request has been rejected");
     })
     .catch(err => {
       console.error(err);
