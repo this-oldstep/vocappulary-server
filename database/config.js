@@ -86,6 +86,8 @@ const Language = sequelize.define('language', {
     type: Sequelize.STRING
   },
   lang_code: Sequelize.STRING,
+  transTTS: Sequelize.STRING,
+  transSTT: Sequelize.STRING,
   flag_url: {
     type: Sequelize.STRING
   },
