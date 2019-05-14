@@ -25,17 +25,21 @@ const User = sequelize.define('user', {
     type: Sequelize.INTEGER,
     autoIncrement: true,
     allowNull: false,
-    primaryKey: true
+    primaryKey: true,
   },
   username: {
     type: Sequelize.STRING,
-    allowNull: false
+    allowNull: false,
   },
   email: {
-    type: Sequelize.STRING
+    type: Sequelize.STRING,
   },
   points: {
-    type: Sequelize.INTEGER
+    type: Sequelize.INTEGER,
+  },
+  firebase: {
+    type: Sequelize.STRING,
+    allowNull: true,
   },
 });
 
@@ -197,7 +201,7 @@ User.hasMany(Message, {as: {singular: "receiver", plural: "receivers"}, foreignK
 
 
 sequelize
-  .sync(/* {force: true} */)
+  .sync({/* force: true */})
   .then(result => {
     console.log('succesfully connected to database');
     // adds languages if they do not exist
