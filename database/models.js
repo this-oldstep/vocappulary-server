@@ -37,7 +37,6 @@ const findOrCreateTranslations = (collectionItemId, getAudio = false) => {
 
     .then(([userRow, collectionItemRow]) => {
       // gets rows in the follwing order: collectionItem, native language, current language, english language
-      // const promisesArr = [
       return Promise.all([
 
         new Promise((res, rej) => {
@@ -77,13 +76,11 @@ const findOrCreateTranslations = (collectionItemId, getAudio = false) => {
         collectionItemRow
 
       ]);
-      // return Promise.all(promisesArr.concat([collectionItemRow]));
     })
 
 
     .then(([nativeLanguageRow, currentLanguageRow, englishLanguageRow, collectionItemRow]) => {
 
-      // const translationPromisesArr = [
       return Promise.all([
 
         new Promise((res, rej) => {
@@ -173,33 +170,10 @@ const findOrCreateTranslations = (collectionItemId, getAudio = false) => {
         collectionItemRow,
       
       ])
-
-      // return Promise.all(translationPromisesArr.concat([currentLanguageRow, collectionItemRow]));
     })
+
+
     .then(([nativeTranslationRow, currentTranslationRow, currentLanguageRow, collectionItemRow]) => {
-      // const currentAudioPromise = 
-      //   new Promise((res, rej) => {
-      //     if(currentTranslationRow.audio_url || !getAudio) {
-      //       res(currentTranslationRow)
-      //     } else {
-      //       googleTextToSpeech(currentTranslationRow.text, currentLanguageRow.lang_code)
-              
-      //         .then(currentAudioUrl => {
-      //           return currentTranslationRow.update({
-      //             audio_url: currentAudioUrl,
-      //           }, {
-      //             fields: ['audio_url']
-      //           })
-      //         })
-              
-      //         .then(currentTranslationRow => {
-      //           res(currentTranslationRow);
-      //         })
-      //         .catch(err => {
-      //           rej(err);
-      //         })
-      //     }
-      //   })
       return Promise.all([
         new Promise((res, rej) => {
           if(currentTranslationRow.audio_url || !getAudio) {
@@ -479,7 +453,6 @@ const getAllCollectionItemsForUser = (userId) => {
       return Promise.all(
         collectionRows.map(collectionRow => 
           new Promise((res, rej) => {
-            // findOrCreateTranslations(collectionRow.id)
             collectionRow.getCollection_items()
               .then(collectionItemRows => {
                 res(collectionItemRows);
