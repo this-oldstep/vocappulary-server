@@ -1,15 +1,26 @@
 require('dotenv').config();
 const express = require('express');
-const app = express();
+// const app = express();
+const { app } = require('./appInitialization');
 const router = express.Router();
 const bodyParser = require('body-parser');
-const { db } = require("./database/models")
-const fileUpload = require('express-fileupload')
+const { db } = require("./database/models");
+const fileUpload = require('express-fileupload');
+const { io } = require('./socketIo');
+
 
 app.use(fileUpload({
   limits: { fileSize: 50 * 1024 * 1024 },
 }));
 app.use(bodyParser.json({ type: 'application/json'}));
+
+
+//////////////
+// WebSocket /
+//////////////
+
+
+
 
 ///////////////
 /// Routes ////
@@ -52,8 +63,3 @@ app.get('/languages', (req, res) => {
       res.json(languages);
     })
 })
-
-
-app.get('/', (req, res) => res.send('Hello World!'));
-const port = 3000;
-app.listen(port, () => console.log(`Vocapp server listening on port ${port}!`));

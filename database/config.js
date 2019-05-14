@@ -129,7 +129,7 @@ const Translation = sequelize.define('translation', {
 
 class Message extends Model {};
 Message.init({
-  text: Sequelize.BIGINT,
+  text: Sequelize.TEXT,
 }, {
   sequelize,
   modelName: 'message',
@@ -178,8 +178,8 @@ User.belongsToMany(User, {as: {singular: "requester", plural:"requesters"}, thro
 User.belongsToMany(User, {as: {singular: "potentialBuddy", plural: "potentialBuddies"}, through: {model: Request}, foreignKey: "potentialBuddyId"});
 
 //Messages//
-User.belongsToMany(User, {as: {singular: "sender", plural: "senders"}, through: {model: Message}, foreignKey: "senderId"});
-User.belongsToMany(User, {as: {singular: "receiver", plural: "receivers"}, through: {model: Message}, foreignKey: "receiverId"});
+User.hasMany(Message, {as: {singular: "sender", plural: "senders"}, foreignKey: "senderId"});
+User.hasMany(Message, {as: {singular: "receiver", plural: "receivers"}, foreignKey: "receiverId"});
 
 /////////////////////
 /////HELPERS/////////

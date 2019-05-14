@@ -719,13 +719,36 @@ const getPotentialBuddies = (userId) => {
 
 
 const getMessages = (userId, buddyId) => {
-
+  return Promise.all([
+    Message.findAll({
+      where: {
+        senderId: userId, 
+        receiverId: buddyId,
+      }
+    }),
+    Message.findAll({
+      where: {
+        senderId: buddyId,
+        receiverId: userId,
+      }
+    }),
+  ])
+    .then(([userMessages, buddyMessages]) => {
+      return userMessages.concat(buddyMessages).sort((a, b) => {
+        return a.createdAt.getTime() > b.createdAt.getTime() ? 1 : -1;
+      })
+    })
 }
 
 
 
-const addMessage = (userId, buddyId) => {
 
+const addMessage = (userId, buddyId, text) => {
+  return Message.create({
+    senderId: userId,
+    receiverId: buddyId,
+    text,
+  });
 }
 
 
