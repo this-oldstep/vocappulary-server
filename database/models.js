@@ -720,6 +720,11 @@ const getPotentialBuddies = (userId) => {
             });
           })
         );
+      })
+      
+      
+      .then(userRows => {
+        return userRows.filter(userRow => userRow.id !== userId);
       });
     });
 };
