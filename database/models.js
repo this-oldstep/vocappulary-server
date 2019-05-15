@@ -321,7 +321,7 @@ const selectWord = function(wordId, collectionId, imgUrl){
     wordId,
     image_url: imgUrl,
   })
-}
+};
 
 
 
@@ -349,7 +349,7 @@ const getAllCollectionItems = (collectionId) => {
         }),
       ))
     })
-}
+};
 
 
 
@@ -364,7 +364,7 @@ const getTranslation = (wordId, language) => {
     .then(langRow => 
       Translation.findOne({where: {wordId, languageId: langRow.id}}),
     )
-}
+};
 
 
 
@@ -430,7 +430,9 @@ const createCollection = (userId, name, isPublic = false) => {
     count: 0,
     userId,
   })
-}
+};
+
+
 
 const deleteCollection = (name, userId)=>{
   return Collection.destroy({
@@ -439,7 +441,7 @@ const deleteCollection = (name, userId)=>{
       userId,
     },
   })
-}
+};
 
 
 
@@ -481,7 +483,7 @@ const getAllCollectionItemsForUser = (userId) => {
         ),
       )
     })
-}
+};
 
 
 
@@ -491,7 +493,7 @@ const getAllCollectionItemsForUser = (userId) => {
  * @returns - object containing the collection rows
  */
 const getAllCollections = userId => 
-  Collection.findAll({where: {userId}})
+  Collection.findAll({where: {userId}});
 
 
 
@@ -500,13 +502,17 @@ const getAllCollections = userId =>
  */
 const getAllLanguages = () => Language.findAll();
 
+
+
 const getLanguageById = (languageId) => {
   return Language.findOne({
     where: {
       userId: languageId,
     },
   })
-}
+};
+
+
 
 const makeUser = (username, email, currentLanguageId, nativeLanguageId, points, firebase) => User.create({
   username, email, currentLanguageId, nativeLanguageId, points, firebase,
@@ -585,7 +591,7 @@ const getBuddies = (userId) => {
         currentLanguageId: buddyRow.currentLanguageId,
       }));
     })
-}
+};
 
 
 
@@ -615,7 +621,7 @@ const sendRequest = (userId, potentialBuddyId) => {
     requesterId: userId,
     potentialBuddyId,
   })
-}
+};
 
 
 
@@ -635,6 +641,8 @@ const acceptBuddyRequest = (userId, newBuddyId) => {
     })
 };
 
+
+
 const rejectBuddyRequest = (userId, rejectedBuddyId) => {
   return Request.findOne({
     where: {
@@ -646,7 +654,7 @@ const rejectBuddyRequest = (userId, rejectedBuddyId) => {
       return requestRow.destroy();
     })
 
-}
+};
 
 
 
@@ -763,7 +771,7 @@ const getMessages = (userId, buddyId) => {
         return a.createdAt.getTime() > b.createdAt.getTime() ? 1 : -1;
       })
     })
-}
+};
 
 
 
@@ -774,7 +782,7 @@ const addMessage = (userId, buddyId, text) => {
     receiverId: buddyId,
     text,
   });
-}
+};
 
 
 
