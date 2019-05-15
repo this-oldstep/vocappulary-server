@@ -1,11 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { db } = require('../database/models.js');
-
-
-
-
-
+const { isAuthenticated } = require('../middleware')
 
 
 router.get('/all/:userId/:buddyId', (req, res) => {

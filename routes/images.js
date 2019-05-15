@@ -5,6 +5,7 @@ var cloudinary = require('cloudinary').v2;
 // const axios = require('axios');
 const { googleTranslate } = require('../apiHelpers');
 const { User } = require('../database/config');
+const { isAuthenticated } = require('../middleware')
 
 const app = new Clarifai.App({ apiKey: process.env.CLARIFAI_KEY });
 

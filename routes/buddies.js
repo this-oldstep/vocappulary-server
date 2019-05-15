@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const { db } = require('../database/models.js');
+const { isAuthenticated } = require('../middleware');
 
-router.get('/all/:userId', (req, res) => {
+router.get('/all/:userId', isAuthenticated, (req, res) => {
 
   const { userId } = req.params;
 

@@ -9,10 +9,10 @@ const { isAuthenticated } = require('../middleware');
  * takes collectionId
  * gets an array of all the collection items of a collection with their native transltion, current translation, collectionItemId, and image url
  */
-router.get('/:id', isAuthenticated, (req,res)=>{
+router.get('/', isAuthenticated, (req,res)=>{
 
 
-  db.getAllCollectionItems(req.params.id)
+  db.getAllCollectionItems(req.query.id)
     .then(collection => {
       res.json(collection)
     })
