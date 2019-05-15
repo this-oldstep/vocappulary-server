@@ -10,7 +10,7 @@ const sequelize = new Sequelize('vocapp', process.env.DB_USER, process.env.DB_PA
   host: process.env.DB_HOST,
   port: process.env.DB_PORT,
   dialect: 'postgres',
-  logging: false,
+  // logging: false,
   define: {
     charset: 'utf8',
     dialectOptions: {
@@ -87,6 +87,19 @@ const CollectionItem = sequelize.define('collection_item', {
 
 //Languages Model//
 
+// class Language extends Model {};
+// Language.init({
+//   name: Sequelize.STRING,
+//   lang_code: Sequelize.STRING,
+//   transTTS: Sequelize.STRING,
+//   transSTT: Sequelize.STRING,
+//   flag_url: Sequelize.STRING,
+//   active: Sequelize.BOOLEAN,
+// }, {
+//   sequelize,
+//   modelName: "language",
+//   underscored: false,
+// })
 const Language = sequelize.define('language', {
   id: {
     type: Sequelize.INTEGER,
@@ -124,20 +137,33 @@ const Word = sequelize.define('word', {
 
 //Translations//
 
-const Translation = sequelize.define('translation', {
-  id: {
-    type: Sequelize.INTEGER,
-    autoIncrement: true,
-    allowNull: false,
-    primaryKey: true
-  },
+class Translation extends Model {}
+Translation.init({
   text: {
-    type: Sequelize.STRING
+    type: Sequelize.STRING,
+    get() {
+      return this.getDataValue('text').replace('&#39', '\'')
+    }
   },
-  audio_url: {
-    type: Sequelize.STRING
-  }
-});
+  audio_url: Sequelize.STRING,
+}, {
+  sequelize,
+  modelName: 'translation',
+})
+// const Translation = sequelize.define('translation', {
+//   id: {
+//     type: Sequelize.INTEGER,
+//     autoIncrement: true,
+//     allowNull: false,
+//     primaryKey: true
+//   },
+//   text: {
+//     type: Sequelize.STRING
+//   },
+//   audio_url: {
+//     type: Sequelize.STRING
+//   }
+// });
 
 //Messages//
 
