@@ -404,14 +404,26 @@ const addTranslationToWord = (wordId, language, translation) => {
  * @returns an object with image_url and currentLangText. The currentLangText is the language of the text they are learning.
  */
 const makeNewCollectionItem = (collectionId, image_url, wordId) => {
-  return CollectionItem.create({
-    collectionId,
-    image_url,
-    wordId,
-  })
-    .then(collectionItemRow => {
+  return Promise.all([
+      CollectionItem.create({
+      collectionId,
+      image_url,
+      wordId,
+    }),
+    Collection.findOne({
+      where: {
+        id: collectionId,
+      }
+    })]
+  )
+    .then(([collectionItemRow, collectionRow]) => {
+      collectionRow.update({
+        count: collectionRow.count + 1,
+      }, {
+        fields: ["count"],
+      })
       return findOrCreateTranslations(collectionItemRow.id, true);
-    })
+    });
 }
 
 
