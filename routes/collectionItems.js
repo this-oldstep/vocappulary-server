@@ -2,16 +2,17 @@ require('dotenv').config();
 const express = require('express');
 const router = express.Router();
 const { db } = require('../database/models.js');
+const { isAuthenticated } = require('../middleware');
 
 
 /**
  * takes collectionId
  * gets an array of all the collection items of a collection with their native transltion, current translation, collectionItemId, and image url
  */
-router.get('/:id', (req,res)=>{
+router.get('/', isAuthenticated, (req,res)=>{
 
 
-  db.getAllCollectionItems(req.params.id)
+  db.getAllCollectionItems(req.query.id)
     .then(collection => {
       res.json(collection)
     })
@@ -25,7 +26,7 @@ router.get('/:id', (req,res)=>{
  * takes collectionId, imgUrl, and wordId
  * creates a new collection item, and adds a translation of the word if nessisary
  */
-router.post('/', (req,res) => {
+router.post('/', isAuthenticated, (req, res) => {
 
   const { collectionId, imgUrl, wordId } = req.body;
   

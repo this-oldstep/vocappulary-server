@@ -7,6 +7,7 @@ const util = require('util');
 const AWS = require('aws-sdk');
 const path = require('path');
 const { googleSpeechToText } = require('../apiHelpers');
+const { isAuthenticated } = require('../middleware')
 
 
 

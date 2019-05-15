@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const router = express.Router();
 const { googleTextToSpeech } = require('../apiHelpers');
+const { isAuthenticated } = require('../middleware')
 
 
 
