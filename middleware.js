@@ -4,7 +4,7 @@ module.exports = {
   isAuthenticated: (req, res, next) => {
     const { userId, firebase } = req.body;
     db.verifyUser(
-      userId || req.query.id,
+      userId || req.query.id || req.param.id,
       firebase || req.query.firebase,
     ).then((result) => {
       console.log(result);

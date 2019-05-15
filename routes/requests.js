@@ -3,7 +3,7 @@ const router = express.Router();
 const { db } = require('../database/models.js');
 const { isAuthenticated } = require('../middleware')
 
-router.post('/new', (req, res) => {
+router.post('/new', isAuthenticated, (req, res) => {
 
   const { userId, potentialBuddyId } = req.body;
 
@@ -18,11 +18,11 @@ router.post('/new', (req, res) => {
 
 })
 
-router.get('/all/:userId', (req, res) => {
+router.get('/all', isAuthenticated, (req, res) => {
 
-  const { userId } = req.params;
+  const { id } = req.query;
 
-  db.getRequests(userId)
+  db.getRequests(id)
     .then(requests => {
       res.json(requests);
     })
@@ -33,7 +33,7 @@ router.get('/all/:userId', (req, res) => {
 
 })
 
-router.post('/accept', (req, res) => {
+router.post('/accept', isAuthenticated, (req, res) => {
   
   const { userId, newBuddyId } = req.body;
 

@@ -31,7 +31,7 @@ cloudinary.config({
 // 7.- BA -> server sends back to client the translated word && the URL for pronunciation && also completes item table in DB
 
 //returns translation columns in the native language from the database, and takes the pic 
-router.post('/', (req, res) => {
+router.post('/', isAuthenticated, (req, res) => {
 
   let pic = req.body.base64
   let { userId } = req.body

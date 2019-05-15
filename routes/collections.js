@@ -24,7 +24,7 @@ router.post('/', isAuthenticated, (req, res) => {
  * takes userId
  * gets all collections related to a user
  */
-router.post('/get', (req, res)=>{
+router.post('/get', isAuthenticated, (req, res)=>{
   
   let { userId } = req.body
   
