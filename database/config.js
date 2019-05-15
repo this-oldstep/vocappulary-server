@@ -10,7 +10,7 @@ const sequelize = new Sequelize('vocapp', process.env.DB_USER, process.env.DB_PA
   host: process.env.DB_HOST,
   port: process.env.DB_PORT,
   dialect: 'postgres',
-  // logging: false,
+  logging: false,
   define: {
     charset: 'utf8',
     dialectOptions: {
@@ -142,7 +142,7 @@ Translation.init({
   text: {
     type: Sequelize.STRING,
     get() {
-      return this.getDataValue('text').replace('&#39', '\'')
+      return this.getDataValue('text').replace('&#39;', '\'')
     }
   },
   audio_url: Sequelize.STRING,
