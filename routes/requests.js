@@ -54,7 +54,7 @@ router.post('/reject', (req, res) => {
 
   db.rejectBuddyRequest(userId, rejectedBuddyId)
     .then(() => {
-      res.status(201).json("request has been rejected");
+      res.status(201).json({message: "request has been rejected"});
     })
     .catch(err => {
       console.error(err);

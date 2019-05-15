@@ -139,6 +139,12 @@ const Word = sequelize.define('word', {
 
 class Translation extends Model {}
 Translation.init({
+  id: {
+    type: Sequelize.INTEGER,
+    autoIncrement: true,
+    allowNull: false,
+    primaryKey: true,
+  },
   text: {
     type: Sequelize.STRING,
     get() {
