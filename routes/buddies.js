@@ -1,12 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const { db } = require('../database/models.js');
+const { isAuthenticated } = require('../middleware');
 
-router.get('/all/:userId', (req, res) => {
+router.get('/all/', isAuthenticated, (req, res) => {
 
-  const { userId } = req.params;
+  const { id } = req.query;
 
-  db.getBuddies(userId)
+  db.getBuddies(id)
     .then(buddiesList => {
       res.json(buddiesList);
     })

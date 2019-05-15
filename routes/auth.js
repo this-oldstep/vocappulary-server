@@ -17,9 +17,9 @@ router.post('/', (req, res) => {
         username, email, currentLanguageId, nativeLanguageId,
       } = req.body;
       if (req.body.newUser) {
-        return db.makeUser(username, email, currentLanguageId, nativeLanguageId, 0);
+        return db.makeUser(username, email, currentLanguageId, nativeLanguageId, 0, decodedToken.uid);
       }
-      return db.findUser(email);
+      return db.findUser(email, decodedToken.uid);
     }).then((result) => {
       console.log(result);
       res.send(result.dataValues);

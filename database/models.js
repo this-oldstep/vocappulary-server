@@ -20,7 +20,7 @@ const findOrCreateTranslations = (collectionItemId, getAudio = false) => {
   return CollectionItem.findOne({
     where: {
       id: collectionItemId,
-    }
+    },
   })
     
     
@@ -62,8 +62,8 @@ const findOrCreateTranslations = (collectionItemId, getAudio = false) => {
         new Promise((res, rej) => {
           Language.findOne({
             where: {
-              name: "english"
-            }
+              name: "english",
+            },
           })
             .then(englishRow => {
               res(englishRow);
@@ -73,7 +73,7 @@ const findOrCreateTranslations = (collectionItemId, getAudio = false) => {
             })
         }),
 
-        collectionItemRow
+        collectionItemRow,
 
       ]);
     })
@@ -88,40 +88,40 @@ const findOrCreateTranslations = (collectionItemId, getAudio = false) => {
             where: {
               wordId: collectionItemRow.wordId,
               languageId: nativeLanguageRow.id,
-            }
+            },
           })
 
-          .then(transation => {
-          if(transation) {
-            res(transation)
-          } else {
-            Translation.findOne({
-              where: {
-                wordId: collectionItemRow.wordId,
-                languageId: englishLanguageRow.id,
+            .then(transation => {
+              if(transation) {
+                res(transation)
+              } else {
+                Translation.findOne({
+                  where: {
+                    wordId: collectionItemRow.wordId,
+                    languageId: englishLanguageRow.id,
+                  },
+                })
+          
+                  .then(englishTranslationRow => {
+                    return googleTranslate(englishTranslationRow.text, "en", nativeLanguageRow.lang_code);
+                  })
+          
+                  .then(nativeLanguageText => {
+                    return Translation.create({
+                      text: nativeLanguageText,
+                      languageId: nativeLanguageRow.id,
+                      wordId: collectionItemRow.wordId,
+                    })
+                  })
+          
+                  .then(transation => {
+                    res(transation)
+                  })
               }
             })
-          
-            .then(englishTranslationRow => {
-              return googleTranslate(englishTranslationRow.text, "en", nativeLanguageRow.lang_code);
+            .catch(err => {
+              rej(err);
             })
-          
-            .then(nativeLanguageText => {
-              return Translation.create({
-                text: nativeLanguageText,
-                languageId: nativeLanguageRow.id,
-                wordId: collectionItemRow.wordId,
-              })
-            })
-          
-            .then(transation => {
-              res(transation)
-            })
-          }
-          })
-          .catch(err => {
-            rej(err);
-          })
         }),
 
         new Promise((res, rej) => {
@@ -129,36 +129,36 @@ const findOrCreateTranslations = (collectionItemId, getAudio = false) => {
             where: {
               wordId: collectionItemRow.wordId,
               languageId: currentLanguageRow.id,
-            }
+            },
           })
           
-          .then(transation => {
-            if(transation) {
-              res(transation)
-            } else {
-              Translation.findOne({
-                where: {
-                  wordId: collectionItemRow.wordId,
-                  languageId: englishLanguageRow.id,
-                }
-              })
-          
-              .then(englishTranslationRow => {
-                return googleTranslate(englishTranslationRow.text, "en", currentLanguageRow.lang_code);
-              })
-          
-              .then(currentLanguageText => {
-                return Translation.create({
-                  text: currentLanguageText,
-                  languageId: currentLanguageRow.id,
-                  wordId: collectionItemRow.wordId,
-                })
-              })
-          
-              .then(transation => {
+            .then(transation => {
+              if(transation) {
                 res(transation)
-              })
-            }
+              } else {
+                Translation.findOne({
+                  where: {
+                    wordId: collectionItemRow.wordId,
+                    languageId: englishLanguageRow.id,
+                  },
+                })
+          
+                  .then(englishTranslationRow => {
+                    return googleTranslate(englishTranslationRow.text, "en", currentLanguageRow.lang_code);
+                  })
+          
+                  .then(currentLanguageText => {
+                    return Translation.create({
+                      text: currentLanguageText,
+                      languageId: currentLanguageRow.id,
+                      wordId: collectionItemRow.wordId,
+                    })
+                  })
+          
+                  .then(transation => {
+                    res(transation)
+                  })
+              }
             })
             .catch(err => {
               rej(err);
@@ -185,7 +185,7 @@ const findOrCreateTranslations = (collectionItemId, getAudio = false) => {
                 return currentTranslationRow.update({
                   audio_url: currentAudioUrl,
                 }, {
-                  fields: ['audio_url']
+                  fields: ['audio_url'],
                 })
               })
               
@@ -255,12 +255,12 @@ const checkWords = (imageWordList, nativeLanguage) => {
                         wordId: wordCol.id,
                         languageId: engRow.id,
                       })
-                      .then(() => {
-                        res(wordCol)
-                      })
+                        .then(() => {
+                          res(wordCol)
+                        })
                     })
-                  }
-                )
+                },
+                ),
               )
               return false;
             }
@@ -277,7 +277,7 @@ const checkWords = (imageWordList, nativeLanguage) => {
                   // gets the language cols from the language tables for all existing languages of the word
                   word.getWord()
                     .then(language => res(language))
-                })
+                }),
               );
               return Promise.all(getTranslationPromises)
                 .then(language => {
@@ -317,8 +317,8 @@ const checkWords = (imageWordList, nativeLanguage) => {
 
 const selectWord = function(wordId, collectionId, imgUrl){
   return CollectionItem.create({
-    collectionId: collectionId,
-    wordId: wordId,
+    collectionId,
+    wordId,
     image_url: imgUrl,
   })
 }
@@ -334,7 +334,7 @@ const getAllCollectionItems = (collectionId) => {
   return Collection.findOne({
     where: {
       id: collectionId,
-    }
+    },
   })
     .then(collectionRow => {
       return collectionRow.getCollection_items();
@@ -343,10 +343,10 @@ const getAllCollectionItems = (collectionId) => {
       return Promise.all(collectionItems.map(item => 
         new Promise((res, rej) => {
           findOrCreateTranslations(item.id, true)
-          .then(returnItem => {
-            res(returnItem);
-          })
-        })
+            .then(returnItem => {
+              res(returnItem);
+            })
+        }),
       ))
     })
 }
@@ -362,7 +362,7 @@ const getAllCollectionItems = (collectionId) => {
 const getTranslation = (wordId, language) => {
   return Language.findOne({where: {lang_code: language}})
     .then(langRow => 
-      Translation.findOne({where: {wordId, languageId: langRow.id}})
+      Translation.findOne({where: {wordId, languageId: langRow.id}}),
     )
 }
 
@@ -382,7 +382,7 @@ const addTranslationToWord = (wordId, language, translation) => {
       // finds or creates the relavant language
       return Translation.findOrCreate({
         where: {wordId, languageId: langCol.id},
-        defaults: {wordId, text: translation, languageId: langCol.id}
+        defaults: {wordId, text: translation, languageId: langCol.id},
       })
     })
     .then(translatedCol => {
@@ -409,9 +409,9 @@ const makeNewCollectionItem = (collectionId, image_url, wordId) => {
     image_url,
     wordId,
   })
-  .then(collectionItemRow => {
-    return findOrCreateTranslations(collectionItemRow.id, true);
-  })
+    .then(collectionItemRow => {
+      return findOrCreateTranslations(collectionItemRow.id, true);
+    })
 }
 
 
@@ -435,9 +435,9 @@ const createCollection = (userId, name, isPublic = false) => {
 const deleteCollection = (name, userId)=>{
   return Collection.destroy({
     where:{
-      name: name,
-      userId: userId
-    }
+      name,
+      userId,
+    },
   })
 }
 
@@ -447,7 +447,7 @@ const getAllCollectionItemsForUser = (userId) => {
   return Collection.findAll({
     where: {
       userId,
-    }
+    },
   })
     .then(collectionRows => {
       return Promise.all(
@@ -460,8 +460,8 @@ const getAllCollectionItemsForUser = (userId) => {
               .catch(err => {
                 rej(err);
               })
-          })
-        )
+          }),
+        ),
       )
     })
     .then(unflattenedUserCollectionItems => {
@@ -477,8 +477,8 @@ const getAllCollectionItemsForUser = (userId) => {
               .catch(err => {
                 rej(err);
               })
-          })
-        )
+          }),
+        ),
       )
     })
 }
@@ -503,27 +503,39 @@ const getAllLanguages = () => Language.findAll();
 const getLanguageById = (languageId) => {
   return Language.findOne({
     where: {
-      userId: languageId
-    }
+      userId: languageId,
+    },
   })
 }
 
-const makeUser = (username, email, currentLanguageId, nativeLanguageId, points) => 
-  User.create({username, email, currentLanguageId, nativeLanguageId, points})
+const makeUser = (username, email, currentLanguageId, nativeLanguageId, points, firebase) => User.create({
+  username, email, currentLanguageId, nativeLanguageId, points, firebase,
+});
 
 //made this for jest testing
-const deleteUser = (username, email)=>{
-    User.destroy({
-      where:{
-        username: username,
-        email: email,
-      }
-    })
-  }
+const deleteUser = (username, email) => {
+  User.destroy({
+    where: {
+      username,
+      email,
+    },
+  });
+}
 
 
-const findUser = (email) => 
-  User.findOne({where: {email}})
+const findUser = (email, firebase) => User.findOne({
+  where: {
+    email,
+    firebase,
+  },
+});
+
+const verifyUser = (id, firebase) => User.findOne({
+  where: {
+    id,
+    firebase,
+  },
+});
 
 
 const editUser = (userId, currentLanguageId, nativeLanguageId, email) => {
@@ -544,7 +556,7 @@ const editUser = (userId, currentLanguageId, nativeLanguageId, email) => {
   return User.findOne({
     where: {
       id: userId,
-    }
+    },
   })
     .then(userRow => {
       return userRow.update(updateObj, {fields});
@@ -557,12 +569,12 @@ const getBuddies = (userId) => {
   return User.findOne({
     where: {
       id: userId,
-    }
+    },
   })
     .then(userRow => {
       return Promise.all([
         userRow.getBuddy1s(),
-        userRow.getBuddy2s()
+        userRow.getBuddy2s(),
       ])
     })
     .then(([buddySet1, buddySet2]) => {
@@ -581,19 +593,19 @@ const getRequests = (userId) => {
   return User.findOne({
     where: {
       id: userId,
-    }
+    },
   })
-  .then(userRow => {
-    return userRow.getPotentialBuddies()
-  })
-  .then(potentialBuddyRows => {
-    return potentialBuddyRows.map(potentialBuddyRow => ({
-      id: potentialBuddyRow.id,
-      username: potentialBuddyRow.username,
-      nativeLanguageId: potentialBuddyRow.nativeLanguageId,
-      currentLanguageId: potentialBuddyRow.currentLanguageId,
-    }))
-  })
+    .then(userRow => {
+      return userRow.getPotentialBuddies()
+    })
+    .then(potentialBuddyRows => {
+      return potentialBuddyRows.map(potentialBuddyRow => ({
+        id: potentialBuddyRow.id,
+        username: potentialBuddyRow.username,
+        nativeLanguageId: potentialBuddyRow.nativeLanguageId,
+        currentLanguageId: potentialBuddyRow.currentLanguageId,
+      }))
+    })
 }
 
 
@@ -601,7 +613,7 @@ const getRequests = (userId) => {
 const sendRequest = (userId, potentialBuddyId) => {
   return Request.create({
     requesterId: userId,
-    potentialBuddyId: potentialBuddyId,
+    potentialBuddyId,
   })
 }
 
@@ -612,15 +624,15 @@ const acceptBuddyRequest = (userId, newBuddyId) => {
     where: {
       potentialBuddyId: userId,
       requesterId: newBuddyId,
-    }
+    },
   })
-  .then(requestRow => {
-    requestRow.destroy();
-    return Buddies.create({
-      buddy1Id: requestRow.requesterId,
-      buddy2Id: requestRow.potentialBuddyId,
+    .then(requestRow => {
+      requestRow.destroy();
+      return Buddies.create({
+        buddy1Id: requestRow.requesterId,
+        buddy2Id: requestRow.potentialBuddyId,
+      })
     })
-  })
 };
 
 const rejectBuddyRequest = (userId, rejectedBuddyId) => {
@@ -628,11 +640,11 @@ const rejectBuddyRequest = (userId, rejectedBuddyId) => {
     where: {
       potentialBuddyId: userId,
       requesterId: rejectedBuddyId,
-    }
+    },
   })
-  .then(requestRow => {
-    return requestRow.destroy();
-  })
+    .then(requestRow => {
+      return requestRow.destroy();
+    })
 
 }
 
@@ -654,9 +666,9 @@ const getPotentialBuddies = (userId) => {
         Buddies.findAll({
           where: {
             [Op.or]: [{buddy1Id: userId}, {buddy2Id: userId}],
-          }
+          },
         }),
-        userRequestRows
+        userRequestRows,
       ])
     })
 
@@ -668,64 +680,64 @@ const getPotentialBuddies = (userId) => {
             [Op.not]: buddiesRows.reduce((seed, buddyRow) => {
               return seed.concat([buddyRow.buddy1Id, buddyRow.buddy2Id]);
             }, [])
-            .concat(userRequestRows.reduce((seed, userRequestRow) => {
-              return seed.concat([userRequestRow.potentialBuddyId, userRequestRow.requesterId]);
-            }, []))
-          }
-        }
+              .concat(userRequestRows.reduce((seed, userRequestRow) => {
+                return seed.concat([userRequestRow.potentialBuddyId, userRequestRow.requesterId]);
+              }, [])),
+          },
+        },
       })
 
 
-      .then(userRows => {
-        return Promise.all(
-          userRows.map(userRow => {
-            return new Promise((resOuter, rej) => {
-              Promise.all([
-                new Promise((res, rej) => {
-                  userRow.getNative_language()
-                    .then(nativeLanguageRow => {
-                      res(nativeLanguageRow);
-                    })
-                    .catch(err => {
-                      rej(err);
-                    })
-                }),
+        .then(userRows => {
+          return Promise.all(
+            userRows.map(userRow => {
+              return new Promise((resOuter, rej) => {
+                Promise.all([
+                  new Promise((res, rej) => {
+                    userRow.getNative_language()
+                      .then(nativeLanguageRow => {
+                        res(nativeLanguageRow);
+                      })
+                      .catch(err => {
+                        rej(err);
+                      })
+                  }),
 
-                new Promise((res, rej) => {
-                  userRow.getCurrent_language()
-                    .then(currentLanguageRow => {
-                      res(currentLanguageRow)
+                  new Promise((res, rej) => {
+                    userRow.getCurrent_language()
+                      .then(currentLanguageRow => {
+                        res(currentLanguageRow)
+                      })
+                      .catch(err => {
+                        rej(err);
+                      })
+                  }),
+
+                ])
+
+
+                  .then(([nativeLanguage, currentLanguage]) => {
+                    resOuter({
+                      id: userRow.id,
+                      username: userRow.username,
+                      nativeLanguage,
+                      currentLanguage,
                     })
-                    .catch(err => {
-                      rej(err);
-                    })
-                })
-
-              ])
-
-
-                .then(([nativeLanguage, currentLanguage]) => {
-                  resOuter({
-                    id: userRow.id,
-                    username: userRow.username,
-                    nativeLanguage,
-                    currentLanguage,
                   })
-                })
 
 
-                .catch(err => {
-                  rej(err);
-                });
-            });
-          })
-        );
-      })
+                  .catch(err => {
+                    rej(err);
+                  });
+              });
+            }),
+          );
+        })
       
       
-      .then(userRows => {
-        return userRows.filter(userRow => userRow.id !== userId);
-      });
+        .then(userRows => {
+          return userRows.filter(userRow => userRow.id !== userId);
+        });
     });
 };
 
@@ -737,13 +749,13 @@ const getMessages = (userId, buddyId) => {
       where: {
         senderId: userId, 
         receiverId: buddyId,
-      }
+      },
     }),
     Message.findAll({
       where: {
         senderId: buddyId,
         receiverId: userId,
-      }
+      },
     }),
   ])
     .then(([userMessages, buddyMessages]) => {
@@ -778,6 +790,7 @@ module.exports.db = {
   getAllLanguages,
   makeUser,
   findUser,
+  verifyUser,
   deleteUser,
   deleteCollection,
   findOrCreateTranslations,
