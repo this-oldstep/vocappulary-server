@@ -176,7 +176,7 @@ const findOrCreateTranslations = (collectionItemId, getAudio = false) => {
     .then(([nativeTranslationRow, currentTranslationRow, currentLanguageRow, collectionItemRow]) => {
       return Promise.all([
         new Promise((res, rej) => {
-          if(currentTranslationRow.audio_url || !getAudio) {
+          if(currentTranslationRow.audio_url || !getAudio || !currentLanguageRow.transTTS) {
             res(currentTranslationRow)
           } else {
             googleTextToSpeech(currentTranslationRow.text, currentLanguageRow.lang_code)

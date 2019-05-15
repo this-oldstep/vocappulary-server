@@ -92,6 +92,9 @@ const googleSpeechToText = async (base64, currentLanguageId, word, userId) => {
       id: currentLanguageId
     }
   })
+  if(!language.transSTT) {
+    return null;
+  };
   const audio = {
     content: base64,
   };

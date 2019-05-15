@@ -4,7 +4,7 @@ const { db } = require('../database/models.js');
 const { isAuthenticated } = require('../middleware')
 
 
-router.get('/:id/items', isAuthenticated, (req, res) => {
+router.get('/:id/items', (req, res) => {
 
   const { id } = req.params;
 
@@ -19,7 +19,7 @@ router.get('/:id/items', isAuthenticated, (req, res) => {
 
 })
 
-router.patch('/edit/', isAuthenticated, (req, res) => {
+router.patch('/edit/', (req, res) => {
   // email is currently being ignored because of a need to interact with firebase.
   const { id, currentLanguageId, nativeLanguageId/* , email */ } = req.body
 
