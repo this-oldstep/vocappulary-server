@@ -321,7 +321,7 @@ const selectWord = function(wordId, collectionId, imgUrl){
     wordId: wordId,
     image_url: imgUrl,
   })
-}
+};
 
 
 
@@ -349,7 +349,7 @@ const getAllCollectionItems = (collectionId) => {
         })
       ))
     })
-}
+};
 
 
 
@@ -364,7 +364,7 @@ const getTranslation = (wordId, language) => {
     .then(langRow => 
       Translation.findOne({where: {wordId, languageId: langRow.id}})
     )
-}
+};
 
 
 
@@ -412,7 +412,7 @@ const makeNewCollectionItem = (collectionId, image_url, wordId) => {
   .then(collectionItemRow => {
     return findOrCreateTranslations(collectionItemRow.id, true);
   })
-}
+};
 
 
 
@@ -430,7 +430,9 @@ const createCollection = (userId, name, isPublic = false) => {
     count: 0,
     userId,
   })
-}
+};
+
+
 
 const deleteCollection = (name, userId)=>{
   return Collection.destroy({
@@ -439,7 +441,7 @@ const deleteCollection = (name, userId)=>{
       userId: userId
     }
   })
-}
+};
 
 
 
@@ -481,7 +483,7 @@ const getAllCollectionItemsForUser = (userId) => {
         )
       )
     })
-}
+};
 
 
 
@@ -491,7 +493,7 @@ const getAllCollectionItemsForUser = (userId) => {
  * @returns - object containing the collection rows
  */
 const getAllCollections = userId => 
-  Collection.findAll({where: {userId}})
+  Collection.findAll({where: {userId}});
 
 
 
@@ -500,16 +502,22 @@ const getAllCollections = userId =>
  */
 const getAllLanguages = () => Language.findAll();
 
+
+
 const getLanguageById = (languageId) => {
   return Language.findOne({
     where: {
       userId: languageId
     }
   })
-}
+};
+
+
 
 const makeUser = (username, email, currentLanguageId, nativeLanguageId, points) => 
-  User.create({username, email, currentLanguageId, nativeLanguageId, points})
+  User.create({username, email, currentLanguageId, nativeLanguageId, points});
+
+
 
 //made this for jest testing
 const deleteUser = (username, email)=>{
@@ -519,11 +527,13 @@ const deleteUser = (username, email)=>{
         email: email,
       }
     })
-  }
+  };
+
 
 
 const findUser = (email) => 
-  User.findOne({where: {email}})
+  User.findOne({where: {email}});
+
 
 
 const editUser = (userId, currentLanguageId, nativeLanguageId, email) => {
@@ -573,7 +583,7 @@ const getBuddies = (userId) => {
         currentLanguageId: buddyRow.currentLanguageId,
       }));
     })
-}
+};
 
 
 
@@ -594,7 +604,7 @@ const getRequests = (userId) => {
       currentLanguageId: potentialBuddyRow.currentLanguageId,
     }))
   })
-}
+};
 
 
 
@@ -603,7 +613,7 @@ const sendRequest = (userId, potentialBuddyId) => {
     requesterId: userId,
     potentialBuddyId: potentialBuddyId,
   })
-}
+};
 
 
 
@@ -623,6 +633,8 @@ const acceptBuddyRequest = (userId, newBuddyId) => {
   })
 };
 
+
+
 const rejectBuddyRequest = (userId, rejectedBuddyId) => {
   return Request.findOne({
     where: {
@@ -634,7 +646,7 @@ const rejectBuddyRequest = (userId, rejectedBuddyId) => {
     return requestRow.destroy();
   })
 
-}
+};
 
 
 
@@ -751,7 +763,7 @@ const getMessages = (userId, buddyId) => {
         return a.createdAt.getTime() > b.createdAt.getTime() ? 1 : -1;
       })
     })
-}
+};
 
 
 
@@ -762,7 +774,7 @@ const addMessage = (userId, buddyId, text) => {
     receiverId: buddyId,
     text,
   });
-}
+};
 
 
 
