@@ -327,11 +327,23 @@ sequelize
           active: true,
       },
     ];
-    languages.forEach(async lang => 
-        await Language.findOrCreate({
-          where: lang,
+    const addLanguages = (languageArr) => {
+      if (languageArr.length === 0) {
+        return;
+      }
+      const language = languageArr.shift();
+      Language.findOrCreate({
+        where: language,
+      })
+        .then(() => {
+          addLanguages(languageArr);
         })
-    )
+        .catch((err) => {
+          // eslint-disable-next-line no-console
+          console.error(err);
+        });
+    };
+    addLanguages(languages);
   })
   .then(() => {
     // adds moch data
